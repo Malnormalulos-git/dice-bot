@@ -10,7 +10,9 @@ function tokenize(expr) {
       current += char;
     } 
     else if (char === 'd') {
-      tokens.push({type: 'number', value: current ? parseInt(current) : 1});
+      if (tokens.length === 0 || tokens[tokens.length - 1].value !== ')') { // for "...(...)d..." or "d..." cases
+        tokens.push({type: 'number', value: current ? parseInt(current) : 1});
+      }
       tokens.push({type: 'dice', value: 'd'});
       current = '';
     } 
@@ -20,7 +22,7 @@ function tokenize(expr) {
         current = '';
       }
       else if (i == 0){
-        throw new Error(`Expression can\`t start by operator: "${char}" at start in "${expr}"`);
+        throw new Error(`Expressions can\`t start on operator: "${char}" at the start of "${expr}"`);
       }
       else if (tokens[i - 1].type === 'operator' || tokens[i - 1].type === 'dice') {
         throw new Error(`Two operators in a row: "${expr[i - 1] + expr[i]}" in "${expr}"`);
@@ -43,6 +45,9 @@ function tokenize(expr) {
   if (current) {
     tokens.push({type: 'number', value: parseInt(current)});
   }
+  else if ('+-*/('.includes(tokens[tokens.length - 1].value)){
+    throw new Error(`Expressions can\`t end on operator: "${tokens[tokens.length - 1].value}" at the end of "${expr}"`);
+  }
   
   return tokens;
 }
@@ -53,48 +58,38 @@ function parseExpression(expression) {
 	
     const diceRolls = [];
 
-    function parsePlusMinus(tokenExpr) { 
-      let resExpr = parseMultiplicationDivision(tokenExpr);
-      let sum = 0;
-    
-      for(let i = 0; i < tokenExpr.length; i++) {
-        if(resExpr[i].type === 'number'){
-          sum += resExpr[i].value;
-  
-          i++;
-          if(i < resExpr.length && resExpr[i].type === 'operator'){
-            if(resExpr[i].value === '+'){
-              i++;
-              sum += resExpr[i].value;
-            }
-            else if(resExpr[i].value === '-'){
-              i++;
-              sum -= resExpr[i].value;
-            }
-          }
+    function executeOperations(tokenExpr, operators) {
+      for (let i = 0; i < tokenExpr.length; i++) {
+        if (tokenExpr[i].type === 'operator' && operators[tokenExpr[i].value]) {
+          const result = operators[tokenExpr[i].value](tokenExpr[i - 1].value, tokenExpr[i + 1].value);
+          tokenExpr.splice(i - 1, 3, { type: 'number', value: result });
+          i -= 1;
         }
       }
-    
-      return {type: 'number', value: sum};
+      return tokenExpr;
     }
     
-    function parseMultiplicationDivision(tokenExpr) {
+    function parseExpr(tokenExpr) {
       let resExpr = parseParenthesDice(tokenExpr);
+
+      const operators = {
+        '+': (a, b) => a + b,
+        '-': (a, b) => a - b,
+        '*': (a, b) => a * b,
+        '/': (a, b) => a / b
+      };
     
-      for(let i = 0; i < tokenExpr.length; i++) {
-        if(resExpr[i].type === 'operator'){
-          if(resExpr[i].value === '*'){
-            const multRes = resExpr[i - 1].value * resExpr[i + 1].value;
-            resExpr.splice(i - 1, 3, {type: 'number', value: multRes});
-          }
-          else if(resExpr[i].value === '/'){
-            const divRes = resExpr[i - 1].value / resExpr[i + 1].value;
-            resExpr.splice(i - 1, 3, {type: 'number', value: divRes});
-          }
-        }
-      }
+      resExpr = executeOperations(resExpr, {
+        '*': operators['*'],
+        '/': operators['/']
+      });
     
-      return resExpr;
+      resExpr = executeOperations(resExpr, {
+        '+': operators['+'],
+        '-': operators['-']
+      });
+    
+      return resExpr[0];
     }
     
     function parseParenthesDice(tokenExpr) {
@@ -102,18 +97,21 @@ function parseExpression(expression) {
       let parenthesCount = 0;
     
       for(let i = 0; i < tokenExpr.length; i++) { 
-        if(tokenExpr[i].type === 'parenthes'){
-          if(tokenExpr[i].value === '('){
+        if(tokenExpr[i].type === 'parenthes') {
+          if(tokenExpr[i].value === '(') {
             parenthesCount++;
             start = i;
           }
-          else if(tokenExpr[i].value === ')'){
+          else if(tokenExpr[i].value === ')') {
             parenthesCount--;
-            if(parenthesCount === 0){
+            if(parenthesCount === 0) {
               const subExpr = tokenExpr.slice(start + 1, i);
-              const result = parsePlusMinus(subExpr);
+              const result = parseExpr(subExpr);
               tokenExpr.splice(start, i - start + 1, result);
               i = start;
+            }
+            else if (parenthesCount < 0){
+              throw new Error(`At least one extra parenthesis in "${expression}"`);
             }
           }
         }
@@ -123,7 +121,7 @@ function parseExpression(expression) {
       while(i < tokenExpr.length) {
         const token = tokenExpr[i];
         if(token.type === 'number' && i + 2 < tokenExpr.length) {
-          if(tokenExpr[i + 1].type === 'dice' && tokenExpr[i + 2].type === 'number'){
+          if(tokenExpr[i + 1].type === 'dice' && tokenExpr[i + 2].type === 'number') {
             const numOfDices = token.value;
             const numOfSides = tokenExpr[i + 2].value;
     
@@ -151,7 +149,7 @@ function parseExpression(expression) {
       return tokenExpr;
     }
 
-    const result = parsePlusMinus(tokenizedExpression);
+    const result = parseExpr(tokenizedExpression);
     
     let output = `# ${result.value}\n`;
 
@@ -164,7 +162,7 @@ function parseExpression(expression) {
     return `\`\`\`Markdown\n${output.trim()}\`\`\``;
   } 
   catch (error) {
-    return `\`\`\`Markdown\nError: ${error.message}\`\`\``;
+    return `\`\`\`diff\n- Error: ${error.message}\`\`\``;
   }
 }
 
