@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, AttachmentBuilder } = require('discord.js');
+const { MAX_DICE_COUNT, MAX_DICE_SIDES } = require('../../config.js');
 
 function tokenize(expr) {
   const tokens = [];
@@ -150,9 +151,9 @@ function parseExpression(expression) {
             if (numOfDices < 0 || numOfSides < 1) {
               throw new Error(`Invalid number of dices or sides: "${numOfDices}d${numOfSides}" in "${expression}"`);
             }
-            // else if (numOfDices > 500 || numOfSides > 500) {
-            //   throw new Error(`To big number of dices or sides: "${numOfDices}d${numOfSides}" in "${expression}"\n+ Maximum is 500d500`);
-            // }
+            else if (numOfDices > MAX_DICE_COUNT || numOfSides > MAX_DICE_SIDES) {
+              throw new Error(`To big number of dices or sides: "${numOfDices}d${numOfSides}" in "${expression}"\n+ Maximum is ${MAX_DICE_COUNT}d${MAX_DICE_SIDES}`);
+            }
 
             const rolls = [];
             let sum = 0;
@@ -181,17 +182,54 @@ function parseExpression(expression) {
     const result = parseExpr(tokenizedExpression);
     
     let output = `# ${result.value}\n`;
-
     output += `Expression: ${expression}\n`;
+
+    let totalLength = output.length;
+    const rollOutputs = [];
     
-    diceRolls.forEach(roll => {
-      output += `${roll.dice}: [${roll.rolls.join(', ')}] = ${roll.sum}\n`;
-    });
-    
-    return `\`\`\`Markdown\n${output.trim()}\`\`\``;
-  } 
-  catch (error) {
-    return `\`\`\`diff\n- Error: ${error.message}\`\`\``;
+    for (const roll of diceRolls) {
+      const rollOutput = `${roll.dice}: [${roll.rolls.join(', ')}] = ${roll.sum}\n`;
+      rollOutputs.push({ text: rollOutput, sum: roll.sum, dice: roll.dice });
+      totalLength += rollOutput.length;
+    }
+
+    // If total length would exceed Discord's limit, create both summary and detailed output
+    if (totalLength > 1900) {
+      let summaryOutput = `# ${result.value}\n`;
+      summaryOutput += `Expression: ${expression}\n\n`;
+      summaryOutput += `Results too long to display. See attached file for details.\nSummary:\n`;
+      
+      for (const roll of rollOutputs) {
+        summaryOutput += `${roll.dice} = ${roll.sum}\n`;
+      }
+
+      let detailedOutput = `# ${result.value}\n`;
+      detailedOutput += `Expression: ${expression}\n`;
+      rollOutputs.forEach(roll => {
+        detailedOutput += roll.text;
+      });
+
+      return {
+        messageContent: `\`\`\`Markdown\n${summaryOutput.trim()}\`\`\``,
+        fileContent: detailedOutput,
+        requiresFile: true
+      };
+    } 
+    else {
+      rollOutputs.forEach(roll => {
+        output += roll.text;
+      });
+
+      return {
+        messageContent: `\`\`\`Markdown\n${output.trim()}\`\`\``,
+        requiresFile: false
+      };
+    }
+  } catch (error) {
+    return {
+      messageContent: `\`\`\`diff\n- Error: ${error.message}\`\`\``,
+      requiresFile: false
+    };
   }
 }
 
@@ -218,6 +256,18 @@ module.exports = {
 				.toLocaleLowerCase()
 				.replaceAll('д', 'd')
 		));
-    await interaction.reply(result);
+
+    if (result.requiresFile) {
+      const buffer = Buffer.from(result.fileContent, 'utf8');
+      const attachment = new AttachmentBuilder(buffer, { name: 'message.txt' });
+      
+      await interaction.reply({
+        content: result.messageContent,
+        files: [attachment]
+      });
+    } 
+    else {
+      await interaction.reply(result.messageContent);
+    }
 	},
 };
