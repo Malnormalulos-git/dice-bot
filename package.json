@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node .",
-    "deploy-commands": "node deploy-commands.js"
+    "deploy-commands-gl": "node .\\commands-deployment\\deploy-commands-gl.js",
+    "deploy-commands-dev": "node .\\commands-deployment\\deploy-commands-dev.js"
   },
   "keywords": [],
   "author": "",

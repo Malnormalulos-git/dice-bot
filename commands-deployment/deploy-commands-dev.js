@@ -9,12 +9,12 @@ const guildId =  process.env.GUILD_ID;
 const token = process.env.TOKEN;
 
 const commands = [];
-// Grab all the command folders from the commands directory you created earlier
-const foldersPath = path.join(__dirname, 'commands');
+// Grab all the command folders from the commands directory
+const foldersPath = path.join(__dirname, '..\\commands');
 const commandFolders = fs.readdirSync(foldersPath);
 
 for (const folder of commandFolders) {
-	// Grab all the command files from the commands directory you created earlier
+	// Grab all the command files from the commands directory
 	const commandsPath = path.join(foldersPath, folder);
 	const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 	// Grab the SlashCommandBuilder#toJSON() output of each command's data for deployment
@@ -31,6 +31,11 @@ for (const folder of commandFolders) {
 
 // Construct and prepare an instance of the REST module
 const rest = new REST().setToken(token);
+
+// delete all old commands
+rest.put(Routes.applicationGuildCommands(clientId, guildId), { body: [] })
+	.then(() => console.log('Successfully deleted all guild commands.'))
+	.catch(console.error);
 
 // and deploy your commands!
 (async () => {
