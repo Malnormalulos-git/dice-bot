@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, AttachmentBuilder } = require('discord.js');
 
 function tokenize(expr) {
   const tokens = [];
@@ -10,7 +10,8 @@ function tokenize(expr) {
       current += char;
     } 
     else if (char === 'd') {
-      if (tokens.length === 0 || tokens[tokens.length - 1].value !== ')') { // for "...(...)d..." or "d..." cases
+      // to prevent auto substitution 'dY' to '1dY' for "...(...)d..." and "d..." cases
+      if (tokens.length === 0 || tokens[tokens.length - 1].value !== ')') { 
         tokens.push({type: 'number', value: current ? parseInt(current) : 1});
       }
       tokens.push({type: 'dice', value: 'd'});
@@ -21,13 +22,10 @@ function tokenize(expr) {
         tokens.push({type: 'number', value: parseInt(current)});
         current = '';
       }
-      else if (i == 0){
-        throw new Error(`Expressions can\`t start on operator: "${char}" at the start of "${expr}"`);
+      // Error if expression starts on operator; if 2 operators in a row; if operator comes after 'd'
+      if (tokens.length === 0 || tokens[tokens.length - 1].type === 'operator' || tokens[tokens.length - 1].type === 'dice') {
+        throw new Error(`Invalid operator placement: "${char}" in expression "${expr}"`);
       }
-      else if (tokens[i - 1].type === 'operator' || tokens[i - 1].type === 'dice') {
-        throw new Error(`Two operators in a row: "${expr[i - 1] + expr[i]}" in "${expr}"`);
-      }
-
       tokens.push({type: 'operator', value: char});
     } 
     else if ('()'.includes(char)) {
@@ -35,27 +33,28 @@ function tokenize(expr) {
         tokens.push({type: 'number', value: parseInt(current)});
         current = '';
       }
-      tokens.push({type: 'parenthes', value: char});
-    }
+      tokens.push({ type: 'parenthes', value: char });
+    } 
+    // Error if at least one inappropriate character in expression
     else {
-      throw new Error(`At least one inappropriate character: "${char}" in "${expr}"`);
+      throw new Error(`Invalid character: "${char}" in expression "${expr}"`);
     }
   }
   
   if (current) {
     tokens.push({type: 'number', value: parseInt(current)});
+  } 
+  // Error if expression ends on operator or 'd'
+  else if ('+-*/d'.includes(tokens[tokens.length - 1].value)) {
+    throw new Error(`Expression cannot end with an operator or 'd': "${tokens[tokens.length - 1].value}" at the end of "${expr}"`);
   }
-  else if ('+-*/('.includes(tokens[tokens.length - 1].value)){
-    throw new Error(`Expressions can\`t end on operator: "${tokens[tokens.length - 1].value}" at the end of "${expr}"`);
-  }
-  
+
   return tokens;
 }
 
 function parseExpression(expression) {
   try {
     let tokenizedExpression = tokenize(expression);
-	
     const diceRolls = [];
 
     function executeOperations(tokenExpr, operators) {
@@ -68,8 +67,12 @@ function parseExpression(expression) {
       }
       return tokenExpr;
     }
-    
+
     function parseExpr(tokenExpr) {
+      // Error if subexpression starts or ends on operator
+      if (tokenExpr[0].type === 'operator' || tokenExpr[tokenExpr.length - 1].type === 'operator') {
+        throw new Error(`Subexpression in "${expression}" starts or ends on operator`);
+      }
       let resExpr = parseParenthesDice(tokenExpr);
 
       const operators = {
@@ -78,53 +81,79 @@ function parseExpression(expression) {
         '*': (a, b) => a * b,
         '/': (a, b) => a / b
       };
-    
+
       resExpr = executeOperations(resExpr, {
         '*': operators['*'],
         '/': operators['/']
       });
-    
+
       resExpr = executeOperations(resExpr, {
         '+': operators['+'],
         '-': operators['-']
       });
-    
+
+      // Error in case '...(X)(Y)...', when multiplication operators are omitted
+      if (resExpr.length !== 1) {
+        throw new Error(`At least one operator is omitted in expression "${expression}"`);
+      }
       return resExpr[0];
     }
-    
+
     function parseParenthesDice(tokenExpr) {
-      let start = -1;
-      let parenthesCount = 0;
-    
-      for(let i = 0; i < tokenExpr.length; i++) { 
-        if(tokenExpr[i].type === 'parenthes') {
-          if(tokenExpr[i].value === '(') {
-            parenthesCount++;
-            start = i;
-          }
-          else if(tokenExpr[i].value === ')') {
-            parenthesCount--;
-            if(parenthesCount === 0) {
-              const subExpr = tokenExpr.slice(start + 1, i);
-              const result = parseExpr(subExpr);
-              tokenExpr.splice(start, i - start + 1, result);
-              i = start;
+      let parenthesStack = [];
+  
+      for (let i = 0; i < tokenExpr.length; i++) {
+        const token = tokenExpr[i];
+        
+        if (token.type === 'parenthes') {
+          if (token.value === '(') {
+            parenthesStack.push(i);
+          } 
+          else if (token.value === ')') {
+            // Error for extra closing parentheses
+            if (parenthesStack.length === 0) {
+              throw new Error(`Extra closing parentheses in expression "${expression}"`);
             }
-            else if (parenthesCount < 0){
-              throw new Error(`At least one extra parenthesis in "${expression}"`);
+            
+            const startIndex = parenthesStack.pop();
+            const subExpr = tokenExpr.slice(startIndex + 1, i);
+            
+            if (parenthesStack.length === 0) {
+              // Error for empty parentheses
+              if (subExpr.length === 0) {
+                throw new Error(`Empty parentheses in expression "${expression}"`);
+              }
+              
+              const result = parseExpr(subExpr);
+              tokenExpr.splice(startIndex, i - startIndex + 1, result);
+              
+              i = startIndex;
             }
           }
         }
       }
-    
+      
+      // Error for extra opening parentheses
+      if (parenthesStack.length > 0) {
+        throw new Error(`Extra opening parentheses in expression "${expression}"`);
+      }
+
       let i = 0;
-      while(i < tokenExpr.length) {
+      while (i < tokenExpr.length) {
         const token = tokenExpr[i];
-        if(token.type === 'number' && i + 2 < tokenExpr.length) {
-          if(tokenExpr[i + 1].type === 'dice' && tokenExpr[i + 2].type === 'number') {
+        if (token.type === 'number' && i + 2 < tokenExpr.length) {
+          if (tokenExpr[i + 1].type === 'dice' && tokenExpr[i + 2].type === 'number') {
             const numOfDices = token.value;
             const numOfSides = tokenExpr[i + 2].value;
-    
+
+            // Error if number of dices or sides incorrect
+            if (numOfDices < 0 || numOfSides < 1) {
+              throw new Error(`Invalid number of dices or sides: "${numOfDices}d${numOfSides}" in "${expression}"`);
+            }
+            // else if (numOfDices > 500 || numOfSides > 500) {
+            //   throw new Error(`To big number of dices or sides: "${numOfDices}d${numOfSides}" in "${expression}"\n+ Maximum is 500d500`);
+            // }
+
             const rolls = [];
             let sum = 0;
             for (let j = 0; j < numOfDices; j++) {
@@ -132,20 +161,20 @@ function parseExpression(expression) {
               rolls.push(roll);
               sum += roll;
             }
-            
+
             diceRolls.push({
               dice: `${numOfDices}d${numOfSides}`,
               rolls: rolls,
               sum: sum
             });
-    
+
             tokenExpr.splice(i, 3, {type: 'number', value: sum});
             continue; 
           }
         }
         i++;
       }
-    
+
       return tokenExpr;
     }
 
