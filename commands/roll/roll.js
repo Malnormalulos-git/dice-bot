@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, AttachmentBuilder } = require('discord.js');
-const { MAX_DICE_COUNT, MAX_DICE_SIDES } = require('../../config.js');
+const { MAX_DICE_COUNT, MAX_DICE_SIDES, ROLL_KEYWORD_SYNONYMS, MAX_DISCORD_MESSAGE_LENGTH } = require('../../config.js');
 
 function tokenize(expr) {
   const tokens = [];
@@ -25,7 +25,7 @@ function tokenize(expr) {
       }
       // Error if expression starts on operator; if 2 operators in a row; if operator comes after 'd'
       if (tokens.length === 0 || tokens[tokens.length - 1].type === 'operator' || tokens[tokens.length - 1].type === 'dice') {
-        throw new Error(`Invalid operator placement: "${char}" in expression "${expr}"`);
+        return {error: `Invalid operator placement: "${char}" in expression "${expr}"`};
       }
       tokens.push({type: 'operator', value: char});
     } 
@@ -38,7 +38,7 @@ function tokenize(expr) {
     } 
     // Error if at least one inappropriate character in expression
     else {
-      throw new Error(`Invalid character: "${char}" in expression "${expr}"`);
+      return {error: `Invalid character: "${char}" in expression "${expr}"`};
     }
   }
   
@@ -47,7 +47,7 @@ function tokenize(expr) {
   } 
   // Error if expression ends on operator or 'd'
   else if ('+-*/d'.includes(tokens[tokens.length - 1].value)) {
-    throw new Error(`Expression cannot end with an operator or 'd': "${tokens[tokens.length - 1].value}" at the end of "${expr}"`);
+    return {error: `Expression cannot end with an operator or 'd': "${tokens[tokens.length - 1].value}" at the end of "${expr}"`};
   }
 
   return tokens;
@@ -61,7 +61,19 @@ function parseExpression(expression) {
     function executeOperations(tokenExpr, operators) {
       for (let i = 0; i < tokenExpr.length; i++) {
         if (tokenExpr[i].type === 'operator' && operators[tokenExpr[i].value]) {
+
+          // Check for division by zero
+          if (tokenExpr[i].value === '/' && tokenExpr[i + 1].value === 0) {
+            return { error: 'Division by zero' };
+          }
+
           const result = operators[tokenExpr[i].value](tokenExpr[i - 1].value, tokenExpr[i + 1].value);
+
+           // Check for NaN/Infinity results
+          if (!Number.isFinite(result)) {
+            return { error: 'Invalid calculation result' };
+          }
+
           tokenExpr.splice(i - 1, 3, { type: 'number', value: result });
           i -= 1;
         }
@@ -72,9 +84,13 @@ function parseExpression(expression) {
     function parseExpr(tokenExpr) {
       // Error if subexpression starts or ends on operator
       if (tokenExpr[0].type === 'operator' || tokenExpr[tokenExpr.length - 1].type === 'operator') {
-        throw new Error(`Subexpression in "${expression}" starts or ends on operator`);
+        return {error: `Subexpression in "${expression}" starts or ends on operator`};
       }
+
       let resExpr = parseParenthesDice(tokenExpr);
+      if (resExpr.error) {
+        return resExpr;
+      }
 
       const operators = {
         '+': (a, b) => a + b,
@@ -87,15 +103,21 @@ function parseExpression(expression) {
         '*': operators['*'],
         '/': operators['/']
       });
+      if (resExpr.error) {
+        return resExpr;
+      }
 
       resExpr = executeOperations(resExpr, {
         '+': operators['+'],
         '-': operators['-']
       });
+      if (resExpr.error) {
+        return resExpr;
+      }
 
-      // Error in case '...(X)(Y)...', when multiplication operators are omitted
+      // Error in case '...(X)(Y)...', when between parentheses operators are skipped
       if (resExpr.length !== 1) {
-        throw new Error(`At least one operator is omitted in expression "${expression}"`);
+        return {error: `At least one operator is skipped in expression "${expression}"`};
       }
       return resExpr[0];
     }
@@ -113,7 +135,7 @@ function parseExpression(expression) {
           else if (token.value === ')') {
             // Error for extra closing parentheses
             if (parenthesStack.length === 0) {
-              throw new Error(`Extra closing parentheses in expression "${expression}"`);
+              return {error: `Extra closing parentheses in expression "${expression}"`};
             }
             
             const startIndex = parenthesStack.pop();
@@ -122,10 +144,14 @@ function parseExpression(expression) {
             if (parenthesStack.length === 0) {
               // Error for empty parentheses
               if (subExpr.length === 0) {
-                throw new Error(`Empty parentheses in expression "${expression}"`);
+                return {error: `Empty parentheses in expression "${expression}"`};
               }
               
               const result = parseExpr(subExpr);
+              if (result.error) {
+                return result;
+              }
+
               tokenExpr.splice(startIndex, i - startIndex + 1, result);
               
               i = startIndex;
@@ -136,7 +162,7 @@ function parseExpression(expression) {
       
       // Error for extra opening parentheses
       if (parenthesStack.length > 0) {
-        throw new Error(`Extra opening parentheses in expression "${expression}"`);
+        return {error: `Extra opening parentheses in expression "${expression}"`};
       }
 
       let i = 0;
@@ -149,10 +175,10 @@ function parseExpression(expression) {
 
             // Error if number of dices or sides incorrect
             if (numOfDices < 0 || numOfSides < 1) {
-              throw new Error(`Invalid number of dices or sides: "${numOfDices}d${numOfSides}" in "${expression}"`);
+              return {error: `Invalid number of dices or sides: "${numOfDices}d${numOfSides}" in "${expression}"`};
             }
             else if (numOfDices > MAX_DICE_COUNT || numOfSides > MAX_DICE_SIDES) {
-              throw new Error(`To big number of dices or sides: "${numOfDices}d${numOfSides}" in "${expression}"\n+ Maximum is ${MAX_DICE_COUNT}d${MAX_DICE_SIDES}`);
+              return {error: `To big number of dices or sides: "${numOfDices}d${numOfSides}" in "${expression}"\n+ Maximum is ${MAX_DICE_COUNT}d${MAX_DICE_SIDES}`};
             }
 
             const rolls = [];
@@ -180,56 +206,30 @@ function parseExpression(expression) {
     }
 
     const result = parseExpr(tokenizedExpression);
-    
-    let output = `# ${result.value}\n`;
-    output += `Expression: ${expression}\n`;
 
-    let totalLength = output.length;
-    const rollOutputs = [];
-    
-    for (const roll of diceRolls) {
-      const rollOutput = `${roll.dice}: [${roll.rolls.join(', ')}] = ${roll.sum}\n`;
-      rollOutputs.push({ text: rollOutput, sum: roll.sum, dice: roll.dice });
-      totalLength += rollOutput.length;
+    if (result.error){
+      return result;
     }
-
-    // If total length would exceed Discord's limit, create both summary and detailed output
-    if (totalLength > 1900) {
-      let summaryOutput = `# ${result.value}\n`;
-      summaryOutput += `Expression: ${expression}\n\n`;
-      summaryOutput += `Results too long to display. See attached file for details.\nSummary:\n`;
+    else {
+      let totalLength = `# ${result.value}\nExpression: ${expression}\n`.length;
+      const rollOutputs = [];
       
-      for (const roll of rollOutputs) {
-        summaryOutput += `${roll.dice} = ${roll.sum}\n`;
+      for (const roll of diceRolls) {
+        const rollOutput = `${roll.dice}: [${roll.rolls.join(', ')}] = ${roll.sum}\n`;
+        rollOutputs.push({ text: rollOutput, sum: roll.sum, dice: roll.dice });
+        totalLength += rollOutput.length;
       }
 
-      let detailedOutput = `# ${result.value}\n`;
-      detailedOutput += `Expression: ${expression}\n`;
-      rollOutputs.forEach(roll => {
-        detailedOutput += roll.text;
-      });
-
       return {
-        messageContent: `\`\`\`Markdown\n${summaryOutput.trim()}\`\`\``,
-        fileContent: detailedOutput,
-        requiresFile: true
-      };
-    } 
-    else {
-      rollOutputs.forEach(roll => {
-        output += roll.text;
-      });
-
-      return {
-        messageContent: `\`\`\`Markdown\n${output.trim()}\`\`\``,
-        requiresFile: false
-      };
+        totalSum: result.value,
+        rollOutputs: rollOutputs,
+        totalLength: totalLength
+      }
     }
   } catch (error) {
-    return {
-      messageContent: `\`\`\`diff\n- Error: ${error.message}\`\`\``,
-      requiresFile: false
-    };
+    console.log(`"${expression}" causes an unhandled error: `);
+    console.log(error);
+    return {error: `Congrats! You occured unhandled error with "${expression}"!`};
   }
 }
 
@@ -248,26 +248,52 @@ module.exports = {
 			.setRequired(true)
 		),
 	async execute(interaction) {
-		const expression = interaction.options.getString('expression');
-    const result = parseExpression((
-			expression
-				.toString()
-				.replaceAll(' ', '') 
-				.toLocaleLowerCase()
-				.replaceAll('д', 'd')
-		));
+		let expression = interaction.options.getString('expression')
+                                              .toString()
+                                              .replaceAll(' ', '')
+                                              .toLocaleLowerCase();
+    for (const synonym of ROLL_KEYWORD_SYNONYMS) {
+      expression = expression.replaceAll(synonym, 'd');
+    }
 
-    if (result.requiresFile) {
-      const buffer = Buffer.from(result.fileContent, 'utf8');
-      const attachment = new AttachmentBuilder(buffer, { name: 'message.txt' });
+    const result = parseExpression(expression);
+
+    if (result.error) {
+      await interaction.reply(`\`\`\`diff\n- Error: ${result.error}\`\`\``);
+    }
+    else if (result.totalLength > MAX_DISCORD_MESSAGE_LENGTH) {
+      let summaryOutput = `# ${result.totalSum}\n`;
+      summaryOutput += `Expression: ${expression}\n\n`;
+      summaryOutput += `Results too long to display. See attached file for details.\nSummary:\n`;
+
+      for (const roll of result.rollOutputs) {
+        summaryOutput += `${roll.dice} = ${roll.sum}\n`;
+      }
+
+      let detailedOutput = `# ${result.totalSum}\n`;
+      detailedOutput += `Expression: ${expression}\n`;
       
+      result.rollOutputs.forEach(roll => {
+        detailedOutput += roll.text;
+      });
+
+      const buffer = Buffer.from(detailedOutput, 'utf8');
+      const attachment = new AttachmentBuilder(buffer, { name: 'output.txt' });
+
       await interaction.reply({
-        content: result.messageContent,
+        content: `\`\`\`Markdown\n${summaryOutput.trim()}\`\`\``,
         files: [attachment]
       });
-    } 
+    }
     else {
-      await interaction.reply(result.messageContent);
+      let output = `# ${result.totalSum}\n`;
+      output += `Expression: ${expression}\n`;
+
+      result.rollOutputs.forEach(roll => {
+        output += roll.text;
+      });
+
+      await interaction.reply(`\`\`\`Markdown\n${output.trim()}\`\`\``);
     }
 	},
 };
