@@ -13,8 +13,10 @@ module.exports = {
         { 
           name: '📌 Basic Usage', 
           value: '`/roll XdY` - Roll X dice with Y sides\n' +
+                 '`/r XdY` - Same as /roll, just shorter!\n' + 
                  'Example: `/roll 2d6` rolls two six-sided dice\n' +
-                 '`/r XdY` - Same as /roll, just shorter!' 
+                 'Use `;` to multiple rolls\n' + 
+                 'Example: `/r 3d6;d20` rolls tree six-sided and one twenty-sided dice\n'
         },
         { 
           name: '🎯 Advanced Expressions', 

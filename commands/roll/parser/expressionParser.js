@@ -77,7 +77,7 @@ function parseExpression(expression) {
 
       // Error in case '...(X)(Y)...', when between parentheses operators are skipped
       if (resExpr.length !== 1) {
-        return {error: `At least one operator is skipped in expression "${expression}"`};
+        return {error: `At least one operator has been skipped in expression "${expression}"`};
       }
       return resExpr[0];
     }
@@ -130,27 +130,27 @@ function parseExpression(expression) {
         const token = tokenExpr[i];
         if (token.type === 'number' && i + 2 < tokenExpr.length) {
           if (tokenExpr[i + 1].type === 'dice' && tokenExpr[i + 2].type === 'number') {
-            const numOfDices = token.value;
+            const numOfDice = token.value;
             const numOfSides = tokenExpr[i + 2].value;
 
-            // Error if number of dices or sides incorrect
-            if (numOfDices < 0 || numOfSides < 1) {
-              return {error: `Invalid number of dices or sides: "${numOfDices}d${numOfSides}" in "${expression}"`};
+            // Error if number of dice or sides incorrect
+            if (numOfDice < 0 || numOfSides < 1) {
+              return {error: `Invalid number of dice or sides: "${numOfDice}d${numOfSides}" in "${expression}"`};
             }
-            else if (numOfDices > MAX_DICE_COUNT || numOfSides > MAX_DICE_SIDES) {
-              return {error: `To big number of dices or sides: "${numOfDices}d${numOfSides}" in "${expression}". Maximum is ${MAX_DICE_COUNT}d${MAX_DICE_SIDES}`};
+            else if (numOfDice > MAX_DICE_COUNT || numOfSides > MAX_DICE_SIDES) {
+              return {error: `Too big number of dice or sides: "${numOfDice}d${numOfSides}" in "${expression}". Maximum is ${MAX_DICE_COUNT}d${MAX_DICE_SIDES}`};
             }
 
             const rolls = [];
             let sum = 0;
-            for (let j = 0; j < numOfDices; j++) {
+            for (let j = 0; j < numOfDice; j++) {
               const roll = rollDice(numOfSides);
               rolls.push(roll);
               sum += roll;
             }
 
             diceRolls.push({
-              dice: `${numOfDices}d${numOfSides}`,
+              dice: `${numOfDice}d${numOfSides}`,
               rolls: rolls,
               sum: sum
             });
@@ -186,7 +186,7 @@ function parseExpression(expression) {
   } catch (error) {
     console.log(`"${expression}" causes an unhandled error: `);
     console.log(error);
-    return {error: `Congrats! Occured unhandled error with your "${expression}"!`};
+    return {error: `Congrats! Occurred unhandled error with your "${expression}"!`};
   }
 }
 

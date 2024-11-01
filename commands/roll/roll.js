@@ -6,7 +6,7 @@ const { ROLL_KEYWORD_SYNONYMS } = require('../../config.js');
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('roll')
-    .setDescription('Roll any dice/dices')
+    .setDescription('Roll any dice')
     .addStringOption(option => option
       .setName('expression')
       .setDescription('Dice expression (e.g. 2d6, d20)')
