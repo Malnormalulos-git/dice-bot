@@ -5,7 +5,7 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 const clientId = process.env.CLIENT_ID;
-const guildId =  process.env.GUILD_ID;
+const devGuildId =  process.env.DEV_GUILD_ID;
 const token = process.env.TOKEN;
 
 const commands = [];
@@ -33,8 +33,8 @@ for (const folder of commandFolders) {
 const rest = new REST().setToken(token);
 
 // delete all old commands
-rest.put(Routes.applicationGuildCommands(clientId, guildId), { body: [] })
-	.then(() => console.log('Successfully deleted all guild commands.'))
+rest.put(Routes.applicationGuildCommands(clientId, devGuildId), { body: [] })
+	.then(() => console.log('Successfully deleted all dev guild commands.'))
 	.catch(console.error);
 
 // and deploy your commands!
@@ -44,7 +44,7 @@ rest.put(Routes.applicationGuildCommands(clientId, guildId), { body: [] })
 
 		// The put method is used to fully refresh all commands in the guild with the current set
 		const data = await rest.put(
-			Routes.applicationGuildCommands(clientId, guildId),
+			Routes.applicationGuildCommands(clientId, devGuildId),
 			{ body: commands },
 		);
 
