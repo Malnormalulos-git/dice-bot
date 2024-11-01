@@ -4,6 +4,9 @@ const { MAX_DICE_COUNT, MAX_DICE_SIDES, MAX_EXPRESSION_LENGTH } = require('../..
 
 function parseExpression(expression) {
   try {
+    if (expression.length === 0) {
+      return { error: 'Empty expression' };
+    }
     if (expression.length > MAX_EXPRESSION_LENGTH) {
       return { error: `"${expression}" is too long. Maximum length of expression is ${MAX_EXPRESSION_LENGTH}` };
     }
@@ -183,7 +186,7 @@ function parseExpression(expression) {
   } catch (error) {
     console.log(`"${expression}" causes an unhandled error: `);
     console.log(error);
-    return {error: `Congrats! You occured unhandled error with your "${expression}"!`};
+    return {error: `Congrats! Occured unhandled error with your "${expression}"!`};
   }
 }
 
