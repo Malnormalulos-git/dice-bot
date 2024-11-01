@@ -1,9 +1,13 @@
 const { tokenize } = require('./tokenizer');
 const { rollDice } = require('../utils/diceRoller');
-const { MAX_DICE_COUNT, MAX_DICE_SIDES } = require('../../../config.js');
+const { MAX_DICE_COUNT, MAX_DICE_SIDES, MAX_EXPRESSION_LENGTH } = require('../../../config.js');
 
 function parseExpression(expression) {
   try {
+    if (expression.length > MAX_EXPRESSION_LENGTH) {
+      return { error: `"${expression}" is too long. Maximum length of expression is ${MAX_EXPRESSION_LENGTH}` };
+    }
+
     let tokenizedExpression = tokenize(expression);
     if (tokenizedExpression.error) {
       return tokenizedExpression;
@@ -182,7 +186,7 @@ function parseExpression(expression) {
   } catch (error) {
     console.log(`"${expression}" causes an unhandled error: `);
     console.log(error);
-    return {error: `Congrats! You occured unhandled error with "${expression}"!`};
+    return {error: `Congrats! You occured unhandled error with your "${expression}"!`};
   }
 }
 
