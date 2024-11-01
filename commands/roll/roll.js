@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { parseExpression } = require('./parser/expressionParser');
-const { formatOutput, formatLongOutput } = require('./formatters/outputFormatter');
-const { ROLL_KEYWORD_SYNONYMS, MAX_DISCORD_MESSAGE_LENGTH } = require('../../config.js');
+const { outputFormatter } = require('./formatters/outputFormatter');
+const { ROLL_KEYWORD_SYNONYMS } = require('../../config.js');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -13,26 +13,20 @@ module.exports = {
       .setRequired(true)
     ),
   async execute(interaction) {
-    let expression = interaction.options.getString('expression')
-      .toString()
-      .replaceAll(' ', '')
-      .toLocaleLowerCase();
-      
-    for (const synonym of ROLL_KEYWORD_SYNONYMS) {
-      expression = expression.replaceAll(synonym, 'd');
-    }
+    const input = ROLL_KEYWORD_SYNONYMS.reduce(
+      (str, synonym) => str.replaceAll(synonym, 'd'),
+      interaction.options.getString('expression')
+          .toString()
+          .replaceAll(' ', '')
+          .toLowerCase()
+  );
 
-    const result = parseExpression(expression);
+    const expressions = input.split(';');
 
-    if (result.error) {
-      await interaction.reply(`\`\`\`diff\n- Error: ${result.error}\`\`\``);
-      return;
-    } 
-    else if (result.totalLength > MAX_DISCORD_MESSAGE_LENGTH) {
-      await interaction.reply(formatLongOutput(result, expression));
-    } 
-    else {
-      await interaction.reply(formatOutput(result, expression));
-    }
+    const results = expressions.map((expression) => parseExpression(expression));
+
+    const output = outputFormatter(expressions, results);
+
+    await interaction.reply(output);
   },
 };

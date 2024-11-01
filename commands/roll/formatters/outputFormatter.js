@@ -1,39 +1,41 @@
 const { AttachmentBuilder } = require('discord.js');
+const { MAX_DISCORD_MESSAGE_LENGTH } = require('../../../config.js');
 
-function formatOutput(result, expression) {
-  let output = `# ${result.totalSum}\n`;
-  output += `Expression: ${expression}\n`;
+function outputFormatter(expressions, results) {
+  let totalSums = '# ';
+  let expressionsList = '';
+  let rollsList = '\n\n';
 
-  result.rollOutputs.forEach(roll => {
-    output += roll.text;
-  });
+  for (let i = 0; i < expressions.length; i++) {
+    const result = results[i];
+    const expression = expressions[i];
 
-  return `\`\`\`Markdown\n${output.trim()}\`\`\``;
-}
+    totalSums += `${result.error ? result.error : result.totalSum}${results.length === 1 ? '' : '; '}`;
 
-function formatLongOutput(result, expression) {
-  let summaryOutput = `# ${result.totalSum}\n`;
-  summaryOutput += `Expression: ${expression}\n\n`;
-  summaryOutput += `Results too long to display. See attached file for details.\nSummary:\n`;
+    expressionsList += `\nExpression${results.length === 1 ? '' : i + 1}: ${expression}`;
 
-  for (const roll of result.rollOutputs) {
-    summaryOutput += `${roll.dice} = ${roll.sum}\n`;
+    if (!result.error){
+      result.rollOutputs.forEach(roll => {
+        rollsList += roll.text;
+      });
+      rollsList += '\n';
+    }
   }
 
-  let detailedOutput = `# ${result.totalSum}\n`;
-  detailedOutput += `Expression: ${expression}\n`;
-  
-  result.rollOutputs.forEach(roll => {
-    detailedOutput += roll.text;
-  });
+  const output = totalSums + expressionsList + rollsList;
 
-  const buffer = Buffer.from(detailedOutput, 'utf8');
-  const attachment = new AttachmentBuilder(buffer, { name: 'output.txt' });
+  if (output.length + '\`\`\`Markdown\n\`\`\`'.length > MAX_DISCORD_MESSAGE_LENGTH) {
+    const buffer = Buffer.from(output, 'utf8');
+      const attachment = new AttachmentBuilder(buffer, { name: 'detailed.txt' });
 
-  return {
-    content: `\`\`\`Markdown\n${summaryOutput.trim()}\`\`\``,
-    files: [attachment]
-  };
+      return {
+        content: `\`\`\`Markdown\n${(totalSums + expressionsList).trim()}\`\`\``,
+        files: [attachment]
+      };
+  }
+  else {
+    return `\`\`\`Markdown\n${output.trim()}\`\`\``;
+  }
 }
 
-module.exports = { formatOutput, formatLongOutput };
+module.exports = { outputFormatter };

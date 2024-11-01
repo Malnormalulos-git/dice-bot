@@ -135,7 +135,7 @@ function parseExpression(expression) {
               return {error: `Invalid number of dices or sides: "${numOfDices}d${numOfSides}" in "${expression}"`};
             }
             else if (numOfDices > MAX_DICE_COUNT || numOfSides > MAX_DICE_SIDES) {
-              return {error: `To big number of dices or sides: "${numOfDices}d${numOfSides}" in "${expression}"\n+ Maximum is ${MAX_DICE_COUNT}d${MAX_DICE_SIDES}`};
+              return {error: `To big number of dices or sides: "${numOfDices}d${numOfSides}" in "${expression}". Maximum is ${MAX_DICE_COUNT}d${MAX_DICE_SIDES}`};
             }
 
             const rolls = [];
@@ -168,19 +168,16 @@ function parseExpression(expression) {
       return result;
     }
     else {
-      let totalLength = `# ${result.value}\nExpression: ${expression}\n`.length;
       const rollOutputs = [];
       
       for (const roll of diceRolls) {
         const rollOutput = `${roll.dice}: [${roll.rolls.join(', ')}] = ${roll.sum}\n`;
         rollOutputs.push({ text: rollOutput, sum: roll.sum, dice: roll.dice });
-        totalLength += rollOutput.length;
       }
 
       return {
         totalSum: result.value,
-        rollOutputs: rollOutputs,
-        totalLength: totalLength
+        rollOutputs: rollOutputs
       }
     }
   } catch (error) {
