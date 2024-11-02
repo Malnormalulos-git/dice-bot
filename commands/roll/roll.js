@@ -1,7 +1,8 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { parseExpression } = require('./parser/expressionParser');
+const { DiceExpressionParser } = require('./parser/diceExpressionParser.js');
 const { outputFormatter } = require('./formatters/outputFormatter');
 const { ROLL_KEYWORD_SYNONYMS } = require('../../config.js');
+const { rollDice } = require('./utils/diceRoller.js');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -23,7 +24,8 @@ module.exports = {
 
     const expressions = input.split(';');
 
-    const results = expressions.map((expression) => parseExpression(expression));
+    const parser = new DiceExpressionParser(rollDice);
+    const results = expressions.map((expression) => parser.parse(expression));
 
     const output = outputFormatter(expressions, results);
 

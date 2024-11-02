@@ -12,11 +12,11 @@ function outputFormatter(expressions, results) {
 
     totalSums += `${result.error ? result.error : result.totalSum}${results.length === 1 ? '' : '; '}`;
 
-    expressionsList += `\nExpression${results.length === 1 ? '' : i + 1}: ${expression}`;
+    expressionsList += `\nExpression${results.length === 1 ? '' : i + 1}: ${expression ? expression : result.error}`;
 
     if (!result.error){
       result.rollOutputs.forEach(roll => {
-        rollsList += roll.text;
+        rollsList += roll.toString();
       });
       rollsList += '\n';
     }

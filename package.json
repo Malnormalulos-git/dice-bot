@@ -6,13 +6,16 @@
   "scripts": {
     "start": "node .",
     "deploy-commands-gl": "node .\\commands-deployment\\deploy-commands-gl.js",
-    "deploy-commands-dev": "node .\\commands-deployment\\deploy-commands-dev.js"
+    "deploy-commands-dev": "node .\\commands-deployment\\deploy-commands-dev.js",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "discord.js": "^14.16.3",
-    "dotenv": "^16.4.5"
+    "dotenv": "^16.4.5",
+    "jest": "^29.7.0"
   }
 }
