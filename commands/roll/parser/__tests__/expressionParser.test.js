@@ -123,7 +123,7 @@ describe('DiceExpressionParser', () => {
 
     test.each(['(1-2)d6', '2d0', '2d(1-3)'])('should handle negative number of dice or zero and lower sides', (expr) => {
       const result = parser.parse(expr);
-      expect(result.error).toMatch(/Invalid number of dices or sides/);
+      expect(result.error).toMatch(/Invalid number of dice or sides/);
     });
   });
 
@@ -136,12 +136,12 @@ describe('DiceExpressionParser', () => {
 
     test('should handle maximum dice count', () => {
       const result = parser.parse(`${MAX_DICE_COUNT + 1}d6`);
-      expect(result.error).toMatch(/Too big number of dices/);
+      expect(result.error).toMatch(/Too big number of dice/);
     });
 
     test('should handle maximum dice sides', () => {
       const result = parser.parse(`2d${MAX_DICE_SIDES + 1}`);
-      expect(result.error).toMatch(/Too big number of dices/);
+      expect(result.error).toMatch(/Too big number of dice/);
     });
   });
 
@@ -173,5 +173,79 @@ describe('DiceExpressionParser', () => {
       expect(result.totalSum).toBe(30); // 3 * 4 * 5 / 2
       expect(result.rollOutputs).toHaveLength(1);
     });
+  });
+});
+
+describe('Dice Types', () => {
+  let parser;
+  // Mock dice roller that returns sequence: 2, 4, 6
+  const mockDiceRoller = (() => {
+    const sequence = [2, 4, 6];
+    let index = 0;
+    return () => {
+      const value = sequence[index];
+      index = (index + 1) % sequence.length;
+      return value;
+    };
+  })();
+
+  beforeEach(() => {
+    parser = new DiceExpressionParser(mockDiceRoller);
+  });
+
+  describe('Standard Dice (d)', () => {
+    test('should sum all dice rolls', () => {
+      const result = parser.parse('3d6');
+      expect(result.totalSum).toBe(12); // 2 + 4 + 6
+      expect(result.rollOutputs[0].rolls).toEqual([2, 4, 6]);
+    });
+  });
+
+  describe('Highest Roll (h)', () => {
+    test('should return highest roll value', () => {
+      const result = parser.parse('3h6');
+      expect(result.totalSum).toBe(6); // max of [2, 4, 6]
+      expect(result.rollOutputs[0].rolls).toEqual([2, 4, 6]);
+    });
+
+    test('should work with single die', () => {
+      const result = parser.parse('1h6');
+      expect(result.totalSum).toBe(2);
+      expect(result.rollOutputs[0].rolls).toEqual([2]);
+    });
+  });
+
+  describe('Lowest Roll (l)', () => {
+    test('should return lowest roll value', () => {
+      const result = parser.parse('3l6');
+      expect(result.totalSum).toBe(2); // min of [4, 6, 2]
+      expect(result.rollOutputs[0].rolls).toEqual([4, 6, 2]);
+    });
+
+    test('should work with single die', () => {
+      const result = parser.parse('1l6');
+      expect(result.totalSum).toBe(4);
+      expect(result.rollOutputs[0].rolls).toEqual([4]);
+    });
+  });
+
+  describe('Average Roll (a)', () => {
+    test('should return average of rolls', () => {
+      const result = parser.parse('3a6');
+      expect(result.totalSum).toBe(4); // (6 + 2 + 4) / 3
+      expect(result.rollOutputs[0].rolls).toEqual([6, 2, 4]);
+    });
+
+    test('should work with single die', () => {
+      const result = parser.parse('1a6');
+      expect(result.totalSum).toBe(6);
+      expect(result.rollOutputs[0].rolls).toEqual([6]);
+    });
+  });
+
+  test('should handle multiple dice types in one expression', () => {
+    const result = parser.parse('2d6+3h6+2l6-3a6/4');
+    expect(result.rollOutputs).toHaveLength(4);
+    expect(result.totalSum).toBe(13); // (2 + 4) + 6 + 2 - (2 + 4 + 6) / 4
   });
 });

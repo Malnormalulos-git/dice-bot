@@ -8,14 +8,14 @@ class Token {
 }
 
 class DiceRoll {
-  constructor(dice, rolls, sum) {
+  constructor(dice, rolls, diceResult) {
     this.dice = dice;
     this.rolls = rolls;
-    this.sum = sum;
+    this.diceResult = diceResult;
   }
 
   toString() {
-    return `${this.dice}: [${this.rolls.join(', ')}] = ${this.sum}\n`;
+    return `${this.dice}: [${this.rolls.join(', ')}] = ${this.diceResult}\n`;
   }
 }
 
@@ -80,11 +80,11 @@ class DiceExpressionParser {
       if ('0123456789'.includes(char)) {
         current += char;
       } 
-      else if (char === 'd') {
+      else if ('dhla'.includes(char)) {
         if (tokens.length === 0 || tokens[tokens.length - 1].value !== ')') { 
           tokens.push(new Token('number', current ? parseInt(current) : 1));
         }
-        tokens.push(new Token('dice', 'd'));
+        tokens.push(new Token('dice', char));
         current = '';
       } 
       else if ('+-*/'.includes(char)) {
@@ -174,6 +174,12 @@ class DiceExpressionParser {
 
   handleDiceRolls(tokens) {
     const result = [...tokens];
+    const diceTypes = {
+      'd': (rolls) => rolls.reduce((sum, roll) => sum + roll, 0),
+      'h': (rolls) => Math.max(...rolls),
+      'l': (rolls) => Math.min(...rolls),
+      'a': (rolls) => rolls.reduce((sum, roll) => sum + roll, 0) / rolls.length,
+    };
 
     for (let i = 0; i < result.length; i++) {
       if (result[i].type === 'number' &&
@@ -182,31 +188,32 @@ class DiceExpressionParser {
           result[i + 2].type === 'number'
       ) {
         const numOfDice = result[i].value;
+        const dice = result[i + 1].value;
         const numOfSides = result[i + 2].value;
         
         if (numOfDice < 0 || numOfSides < 1) {
-          throw new UserError(`Invalid number of dices or sides: "${numOfDice}d${numOfSides}"`, this.originalExpression);
+          throw new UserError(`Invalid number of dice or sides: "${numOfDice + dice + numOfSides}"`, this.originalExpression);
         }
         if (numOfDice > MAX_DICE_COUNT || numOfSides > MAX_DICE_SIDES) {
-          throw new UserError(`Too big number of dices or sides: "${numOfDice}d${numOfSides}". Maximum is ${MAX_DICE_COUNT}d${MAX_DICE_SIDES}`, this.originalExpression);
+          throw new UserError(`Too big number of dice or sides: "${numOfDice + dice + numOfSides}". Maximum is ${MAX_DICE_COUNT}d${MAX_DICE_SIDES}`, this.originalExpression);
         }
         
         const rolls = [];
-        let sum = 0;
         for (let j = 0; j < numOfDice; j++) {
           const roll = this.diceRoller(numOfSides);
           rolls.push(roll);
-          sum += roll;
         }
+
+        const diceResult = diceTypes[dice](rolls);
         
         const diceRoll = new DiceRoll(
-          `${numOfDice}d${numOfSides}`,
+          `${numOfDice + dice + numOfSides}`,
           rolls,
-          sum
+          diceResult
         );
 
         this.diceRolls.push(diceRoll);
-        result.splice(i, 3, new Token('number', diceRoll.sum));
+        result.splice(i, 3, new Token('number', diceRoll.diceResult));
       }
     }
 
