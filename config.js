@@ -5,7 +5,7 @@ const config = {
   MAX_DICE_SIDES: 5000,
   MAX_DISCORD_MESSAGE_LENGTH: 1900,
   MAX_EXPRESSION_LENGTH: 100,
-  ROLL_KEYWORD_SYNONYMS: ['dice', 'д'],                             // will be replaced by 'd'
+  ROLL_KEYWORD_SYNONYMS: ['dice', 'д', 'в'],                        // will be replaced by 'd'
   HIGHEST_ROLL_KEYWORD_SYNONYMS: ['high', 'highest', 'best', 'b'],  // will be replaced by 'h'
   LOWEST_ROLL_KEYWORD_SYNONYMS: ['low', 'lowest', 'worst', 'w'],    // will be replaced by 'l'
   AVERAGE_ROLL_KEYWORD_SYNONYMS: ['avarage', 'с'],                  // will be replaced by 'a'

@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { DiceExpressionParser } = require('./parser/diceExpressionParser.js');
+const { DiceExpressionParser } = require('./parser/DiceExpressionParser.js');
 const { outputFormatter } = require('./formatters/outputFormatter');
 const { ROLL_KEYWORD_SYNONYMS, HIGHEST_ROLL_KEYWORD_SYNONYMS, LOWEST_ROLL_KEYWORD_SYNONYMS, AVERAGE_ROLL_KEYWORD_SYNONYMS } = require('../../config.js');
 const { rollDice } = require('./utils/diceRoller.js');
