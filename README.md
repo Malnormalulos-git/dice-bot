@@ -1,28 +1,27 @@
 # Dice-bot for Discord
 ## Features
 
-Multiple dice rolling types:
-
-  Regular rolls (sum of all dice)
-  Highest roll (takes the highest result)
-  Lowest roll (takes the lowest result)
-  Average roll (takes the average of all rolls)
-
-
-Support for multiple expressions in one command
-Grouping with parentheses
-Mathematical operations (+, -, *, /)
-Detailed roll results
-Support for large outputs via file attachments
+1. Multiple dice rolling types:
+- Regular rolls (sum of all dice)
+- Highest roll (takes the highest result)
+- Lowest roll (takes the lowest result)
+- Average roll (takes the average of all rolls)
+2. Support for multiple expressions in one command
+3. Grouping with parentheses
+4. Mathematical operations (+, -, *, /)
+5. Detailed roll results
+6. Support for large outputs via file attachments
 
 ## Usage
 Basic Commands
 
-/roll <expression> - main dice rolling command
+/roll 'expression' - main dice rolling command
 
-/r <expression> - shortened version of /roll
+/r 'expression' - shortened version of /roll
 
 /help - shows help information
+
+Also you can roll just by message with prefix (to enable this feature and specify the prefix, make certain changes at config file, the details in Configuration section. Also you need to  toggle on 'Message Content Intent' at [Discord Developer Portal](https://discord.com/developers/applications) > "Bot"): 'prefix''expression'
 
 ## Expression Examples
 
@@ -83,7 +82,8 @@ To get your application's client id: [Discord Developer Portal](https://discord.
 To get your server's id (guildId): [Enable developer mode](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID) > Right-click the server title > "Copy ID"
 
 4. Deploy the commands:
-For development or private use exclusively on one server (single guild):
+
+For development or private use exclusively on one server (single guild, which id specified in GUILD_ID at .env file):
 ```
 npm run deploy-commands-dev
 ```
@@ -91,6 +91,16 @@ npm run deploy-commands-dev
 For global deployment on all servers to which the bot is added:
 ```
 npm run deploy-commands-gl
+```
+
+To delete commands at development or private server (single guild, which id specified in GUILD_ID at .env file):
+```
+npm run delete-commands-dev
+```
+
+To delete commands at all servers to which the bot is added:
+```
+npm run delete-commands-gl
 ```
 
 5. Start the bot:

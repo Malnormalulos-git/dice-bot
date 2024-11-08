@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node .",
     "deploy-commands-gl": "node .\\commands-deployment\\deploy-commands-gl.js",
+    "delete-commands-gl": "node .\\commands-deployment\\delete-commands-gl.js",
     "deploy-commands-dev": "node .\\commands-deployment\\deploy-commands-dev.js",
+    "delete-commands-dev": "node .\\commands-deployment\\delete-commands-dev.js",
     "test": "jest",
     "test:watch": "jest --watch"
   },
