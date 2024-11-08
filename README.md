@@ -111,6 +111,10 @@ MAX_DISCORD_MESSAGE_LENGTH: Maximum length of Discord message  before switching 
 
 ROLL_KEYWORD_SYNONYMS, HIGHEST_ROLL_KEYWORD_SYNONYMS, LOWEST_ROLL_KEYWORD_SYNONYMS, AVERAGE_ROLL_KEYWORD_SYNONYMS: words or symbols, that will be replaced by 'd', 'h', 'l', 'a' respectively
 
+ENABLE_PARSING_BY_MESSAGE_WITH_PREFIX: true to enable parsing by message with prefix specified in MESSAGE_ROLL_PREFIX, false to disable
+
+PARSE_BY_MESSAGE_PREFIX: the prefix with which the message with the expression should begin
+
 BOT_STATUS: bot's status, [detailed](https://discordjs.guide/popular-topics/faq.html#how-do-i-set-my-status-to-watching-listening-to-competing-in)
 
 BOT_ACTIVITY: bot's activity and its signature, [detailed](https://discordjs.guide/popular-topics/faq.html#how-do-i-make-my-bot-display-online-idle-dnd-invisible)
