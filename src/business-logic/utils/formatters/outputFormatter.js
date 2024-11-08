@@ -1,5 +1,5 @@
 const { AttachmentBuilder } = require('discord.js');
-const { MAX_DISCORD_MESSAGE_LENGTH } = require('../../../config.js');
+const { MAX_DISCORD_MESSAGE_LENGTH } = require('../../../../config');
 
 function outputFormatter(expressions, results) {
   let totalSums = '# ';

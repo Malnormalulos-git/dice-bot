@@ -4,7 +4,7 @@ const {
   HIGHEST_ROLL_KEYWORD_SYNONYMS, 
   LOWEST_ROLL_KEYWORD_SYNONYMS,
   AVERAGE_ROLL_KEYWORD_SYNONYMS 
-} = require('../../config.js');
+} = require('../../../config');
 
 module.exports = {
   data: new SlashCommandBuilder()

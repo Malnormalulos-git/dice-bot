@@ -1,5 +1,5 @@
-const { DiceExpressionParser } = require("../diceExpressionParser");
-const { MAX_DICE_COUNT, MAX_DICE_SIDES, MAX_EXPRESSION_LENGTH } = require('../../../../config.js');
+const { DiceExpressionParser } = require("../../../../business-logic/dice/parser/DiceExpressionParser.js");
+const { MAX_DICE_COUNT, MAX_DICE_SIDES, MAX_EXPRESSION_LENGTH } = require('../../../../../config.js');
 
 
 describe('DiceExpressionParser', () => {

@@ -1,42 +1,8 @@
-const { MAX_DICE_COUNT, MAX_DICE_SIDES, MAX_EXPRESSION_LENGTH } = require('../../../config.js');
-
-class Token {
-  constructor(type, value) {
-    this.type = type;
-    this.value = value;
-  }
-}
-
-class DiceRoll {
-  constructor(dice, rolls, diceResult) {
-    this.dice = dice;
-    this.rolls = rolls;
-    this.diceResult = diceResult;
-  }
-
-  toString() {
-    return `${this.dice}: [${this.rolls.join(', ')}] = ${this.diceResult}\n`;
-  }
-}
-
-class ParserResult {
-  constructor(totalSum = 0, rollOutputs = []) {
-    this.totalSum = totalSum;
-    this.rollOutputs = rollOutputs;
-  }
-}
-
-class UserError extends Error {
-  constructor(message, expression = null) {
-    super(message);
-    this.expression = expression;
-    this.name = 'UserError';
-  }
-
-  toString() {
-    return `${this.message}${this.expression ? ` in "${this.expression}"` : ''}`;
-  }
-}
+const { MAX_DICE_COUNT, MAX_DICE_SIDES, MAX_EXPRESSION_LENGTH } = require('../../../../config');
+const { UserError } = require('../../errors/UserError');
+const { DiceRoll } = require('../models/DiceRoll');
+const { ParserResult } = require('../models/ParserResult');
+const { Token } = require('../models/Token');
 
 class DiceExpressionParser {
   constructor(diceRoller) {
@@ -255,9 +221,4 @@ class DiceExpressionParser {
   }
 }
 
-module.exports = {
-  DiceExpressionParser,
-  ParserResult,
-  DiceRoll,
-  UserError
-};
+module.exports = { DiceExpressionParser };

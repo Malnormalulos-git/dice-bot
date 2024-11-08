@@ -1,5 +1,5 @@
 const { Events } = require('discord.js');
-const { BOT_STATUS, BOT_ACTIVITY } = require('../config');
+const { BOT_STATUS, BOT_ACTIVITY } = require('../../config');
 
 module.exports = {
 	name: Events.ClientReady,
