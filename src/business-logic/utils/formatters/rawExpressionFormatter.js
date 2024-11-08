@@ -4,7 +4,12 @@ const { ROLL_KEYWORD_SYNONYMS,
   AVERAGE_ROLL_KEYWORD_SYNONYMS 
 } = require('../../../../config');
 
-function expressionFormatter(rawExpression) {
+/**
+ * Processes a raw dice roll expression/s and returns lowercased output with substituted synonyms and without ' '
+ * @param {string} rawExpression Raw dice expression/s input
+ * @returns {string} Lowercased string output with substituted synonyms and without ' '
+ */
+function rawExpressionFormatter(rawExpression) {
   let resultExpression = rawExpression
                           .replaceAll(' ', '')
                           .toLowerCase();
@@ -32,4 +37,4 @@ function expressionFormatter(rawExpression) {
   return resultExpression;
 }
 
-module.exports = { expressionFormatter };
+module.exports = { rawExpressionFormatter };

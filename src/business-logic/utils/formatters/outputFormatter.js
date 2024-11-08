@@ -1,6 +1,12 @@
 const { AttachmentBuilder } = require('discord.js');
 const { MAX_DISCORD_MESSAGE_LENGTH } = require('../../../../config');
 
+/**
+ * Formats the output of processed dice roll expressions
+ * @param {string[]} expressions Array of string expressions that was processed
+ * @param {(ParserResult | { error: string })[]} results Array of ParserResult | { error: string } of processed expressions
+ * @returns {string | AttachmentBuilder} Formatted output of dice roll expressions
+ */
 function outputFormatter(expressions, results) {
   let totalSums = '# ';
   let expressionsList = '';

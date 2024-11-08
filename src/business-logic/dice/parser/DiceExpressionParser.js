@@ -11,6 +11,11 @@ class DiceExpressionParser {
     this.originalExpression = '';
   }
 
+  /**
+   * Processes a dice roll expression and returns ParserResult or { error }
+   * @param {string} expression Dice expression input
+   * @returns {ParserResult | { error: string }} ParserResult | { error: string } result
+   */
   parse(expression) {
     try {
       this.originalExpression = expression;
@@ -36,6 +41,11 @@ class DiceExpressionParser {
     }
   }
 
+  /**
+   * Tokenizes the given expression into a list of tokens
+   * @param {string} expr Dice expression input
+   * @returns {Token[]} Array of tokens
+   */
   tokenize(expr) {
     const tokens = [];
     let current = '';
@@ -87,6 +97,11 @@ class DiceExpressionParser {
     return tokens;
   }
 
+  /**
+   * Parses the tikenized expression and returns the result
+   * @param {Token[]} tokens Array of tokens
+   * @returns {Token} Resulting token after parsing the expression
+   */
   parseExpression(tokens) {
     if (tokens[0].type === 'operator' || tokens[tokens.length - 1].type === 'operator') {
       throw new UserError('Subexpression starts or ends on operator', this.originalExpression);
@@ -104,6 +119,11 @@ class DiceExpressionParser {
     return processedTokens[0];
   }
 
+  /**
+   * Handles parentheses in the given tokens
+   * @param {Token[]} tokens Array of tokens
+   * @returns {Token[]} Array of tokens with parentheses processed
+   */
   handleParentheses(tokens) {
     const stack = [];
     const result = [...tokens];
@@ -138,6 +158,11 @@ class DiceExpressionParser {
     return result;
   }
 
+  /**
+   * Handles dice rolls in the given tokens
+   * @param {Token[]} tokens Array of tokens
+   * @returns {Token[]} Array of tokens with dice rolls processed
+   */
   handleDiceRolls(tokens) {
     const result = [...tokens];
     const diceTypes = {
@@ -186,6 +211,12 @@ class DiceExpressionParser {
     return result;
   }
 
+  /**
+   * Executes operations on the given tokens
+   * @param {Token[]} tokens Array of tokens
+   * @param {string[]} operators Array of operators to execute
+   * @returns {Token[]} Array of tokens with operations executed
+   */
   executeOperations(tokens, operators) {
     const result = [...tokens];
 
