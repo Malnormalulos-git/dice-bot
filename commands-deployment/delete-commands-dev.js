@@ -11,5 +11,5 @@ const rest = new REST().setToken(token);
 
 // delete all old commands
 rest.put(Routes.applicationGuildCommands(clientId, devGuildId), { body: [] })
-	.then(() => console.log('Successfully deleted all dev guild commands.'))
-	.catch(console.error);
+    .then(() => console.log('Successfully deleted all dev guild commands.'))
+    .catch(console.error);

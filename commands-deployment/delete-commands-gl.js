@@ -10,5 +10,5 @@ const rest = new REST().setToken(token);
 
 // delete all old commands
 rest.put(Routes.applicationCommands(clientId), { body: [] })
-	.then(() => console.log('Successfully deleted all application commands.'))
-	.catch(console.error);
+    .then(() => console.log('Successfully deleted all application commands.'))
+    .catch(console.error);
