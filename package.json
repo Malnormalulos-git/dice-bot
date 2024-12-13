@@ -5,19 +5,26 @@
   "main": "index.js",
   "scripts": {
     "start": "node .",
-    "deploy-commands-gl": "node .\\commands-deployment\\deploy-commands-gl.js",
-    "delete-commands-gl": "node .\\commands-deployment\\delete-commands-gl.js",
-    "deploy-commands-dev": "node .\\commands-deployment\\deploy-commands-dev.js",
-    "delete-commands-dev": "node .\\commands-deployment\\delete-commands-dev.js",
+    "deploy-commands-gl": "node ./commands-deployment/deploy-commands-gl.js",
+    "delete-commands-gl": "node ./commands-deployment/delete-commands-gl.js",
+    "deploy-commands-dev": "node ./commands-deployment/deploy-commands-dev.js",
+    "delete-commands-dev": "node ./commands-deployment/delete-commands-dev.js",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "discord.js": "^14.16.3",
-    "dotenv": "^16.4.5",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.16.0",
+    "eslint": "^9.16.0",
+    "globals": "^15.13.0",
     "jest": "^29.7.0"
   }
 }
