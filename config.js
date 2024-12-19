@@ -5,10 +5,10 @@ const config = {
     MAX_DICE_SIDES: 5000,
     MAX_DISCORD_MESSAGE_LENGTH: 1900,
     MAX_EXPRESSION_LENGTH: 100,
-    ROLL_KEYWORD_SYNONYMS: ['dice', 'д', 'в'],                                       // will be replaced by 'd'
-    HIGHEST_ROLL_KEYWORD_SYNONYMS: ['high', 'highest', 'best', 'b', 'кращій', 'к'],  // will be replaced by 'h'
-    LOWEST_ROLL_KEYWORD_SYNONYMS: ['low', 'lowest', 'worst', 'w', 'гірший', 'г'],    // will be replaced by 'l'
-    AVERAGE_ROLL_KEYWORD_SYNONYMS: ['avarage', 'середній', 'с'],                     // will be replaced by 'a'
+    ROLL_KEYWORD_SYNONYMS: ['dice'],                                    // will be replaced by 'd'
+    HIGHEST_ROLL_KEYWORD_SYNONYMS: ['high', 'highest', 'best', 'b'],    // will be replaced by 'h'
+    LOWEST_ROLL_KEYWORD_SYNONYMS: ['low', 'lowest', 'worst', 'w'],      // will be replaced by 'l'
+    AVERAGE_ROLL_KEYWORD_SYNONYMS: ['average'],                         // will be replaced by 'a'
     ENABLE_PARSING_BY_MESSAGE_WITH_PREFIX: true,
     PARSE_BY_MESSAGE_PREFIX: '!',
     BOT_STATUS: PresenceUpdateStatus.DoNotDisturb,

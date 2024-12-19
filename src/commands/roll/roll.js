@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { DiceRollingService } = require('../../business-logic/dice/services/DiceRollingService');
+const { processRoll } = require('../../business-logic/dice/services/DiceRollingService');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -13,8 +13,7 @@ module.exports = {
     async execute(interaction) {
         const input = interaction.options.getString('expression');
 
-        const diceRollingService = new DiceRollingService();
-        const output = diceRollingService.processRoll(input);
+        const output = processRoll(input);
     
         await interaction.reply(output);
     },

@@ -80,7 +80,7 @@ class DiceExpressionParser {
                     tokens.push(new Token('number', parseInt(current)));
                     current = '';
                 }
-                tokens.push(new Token('parenthes', char));
+                tokens.push(new Token('parentheses', char));
             } 
             else {
                 throw new UserError(`Invalid character: "${char}" in expression "${expr}"`, expr);
@@ -98,7 +98,7 @@ class DiceExpressionParser {
     }
 
     /**
-   * Parses the tikenized expression and returns the result
+   * Parses the tokenized expression and returns the result
    * @param {Token[]} tokens Array of tokens
    * @returns {Token} Resulting token after parsing the expression
    */
@@ -129,7 +129,7 @@ class DiceExpressionParser {
         const result = [...tokens];
 
         for (let i = 0; i < result.length; i++) {
-            if (result[i].type === 'parenthes') {
+            if (result[i].type === 'parentheses') {
                 if (result[i].value === '(') {
                     stack.push(i);
                 } else {
