@@ -1,14 +1,7 @@
-const { SlashCommandBuilder } = require('discord.js');
 const { execute } = require('./roll.js');
+const {createRollDiceCommand} = require("../../business-logic/utils/commandBuilders/createRollDiceCommand");
 
 module.exports = {
-    data: new SlashCommandBuilder()
-        .setName('r')
-        .setDescription('Roll dice (shortened version)')
-        .addStringOption(option =>
-            option
-                .setName('expression')
-                .setDescription('Dice expression (e.g. 2d6+5)')
-                .setRequired(true)),
+    data: createRollDiceCommand('r', 'Roll dice (shortened version)'),
     execute: execute 
 };

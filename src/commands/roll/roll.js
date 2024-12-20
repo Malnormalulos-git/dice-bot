@@ -1,15 +1,8 @@
-const { SlashCommandBuilder } = require('discord.js');
 const { processRoll } = require('../../business-logic/dice/services/DiceRollingService');
+const {createRollDiceCommand} = require("../../business-logic/utils/commandBuilders/createRollDiceCommand");
 
 module.exports = {
-    data: new SlashCommandBuilder()
-        .setName('roll')
-        .setDescription('Roll any dice')
-        .addStringOption(option => option
-            .setName('expression')
-            .setDescription('Dice expression (e.g. 2d6, d20)')
-            .setRequired(true)
-        ),
+    data: createRollDiceCommand('roll', 'Roll any dice'),
     async execute(interaction) {
         const input = interaction.options.getString('expression');
 
