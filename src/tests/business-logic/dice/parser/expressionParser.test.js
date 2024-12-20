@@ -72,76 +72,97 @@ describe('DiceExpressionParser', () => {
 
     describe('Error Handling', () => {
         test('should handle empty expression', () => {
-            const result = parser.parse('');
-            expect(result.error).toMatch(/Empty expression/);
+            const t = () => {
+                parser.parse('');
+            };
+            expect(t).toThrow(/Empty expression/);
         });
 
         test('should handle invalid operator placement', () => {
-            const result = parser.parse('2d6++3');
-            expect(result.error).toMatch(/Invalid operator placement/);
+            const t = () => {
+                parser.parse('2d6++3');
+            };
+            expect(t).toThrow(/Invalid operator placement/);
         });
 
-        test('should handle invalid dice notation', () => {
-            const result = parser.parse('2d');
-            expect(result.error).toMatch(/Expression cannot end with an operator or 'd'/);
-        });
-
-        test.each(['2d', '2+'])('should handle invalid expression ending with operator: %s', (expr) => {
-            const result = parser.parse(expr);
-            expect(result.error).toMatch(/Expression cannot end with an operator or 'd'/);
+        test.each(['2d', '2+'])('should handle invalid expression ending with operator or dice notation: %s', (expr) => {
+            const t = () => {
+                parser.parse(expr);
+            };
+            expect(t).toThrow(/Expression cannot end with an operator or 'd'/);
         });
 
         test('should handle invalid subexpressions', () => {
-            const result = parser.parse('1+(1+)');
-            expect(result.error).toMatch(/Subexpression starts or ends on operator/);
+            const t = () => {
+                parser.parse('1+(1+)');
+            };
+            expect(t).toThrow(/Subexpression starts or ends on operator/);
         });
 
         test('should handle skipped operators', () => {
-            const result = parser.parse('(2+2)(1+1)');
-            expect(result.error).toMatch(/At least one operator is skipped/);
+            const t = () => {
+                parser.parse('(2+2)(1+1)');
+            };
+            expect(t).toThrow(/At least one operator is skipped/);
         });
 
         test('should handle extra closing parentheses', () => {
-            const result = parser.parse('(2+2)+1)');
-            expect(result.error).toMatch(/Extra closing parentheses/);
+            const t = () => {
+                parser.parse('(2+2)+1)');
+            };
+            expect(t).toThrow(/Extra closing parentheses/);
         });
 
         test('should handle empty parentheses', () => {
-            const result = parser.parse('2d6+()');
-            expect(result.error).toMatch(/Empty parentheses/);
+            const t = () => {
+                parser.parse('2d6+()');
+            };
+            expect(t).toThrow(/Empty parentheses/);
         });
 
         test('should handle extra opening parentheses', () => {
-            const result = parser.parse('(2d6');
-            expect(result.error).toMatch(/Extra opening parentheses/);
+            const t = () => {
+                parser.parse('(2d6');
+            };
+            expect(t).toThrow(/Extra opening parentheses/);
         });
 
         test('should handle division by zero', () => {
-            const result = parser.parse('2d6/0');
-            expect(result.error).toMatch(/Division by zero/);
+            const t = () => {
+                parser.parse('2d6/0');
+            };
+            expect(t).toThrow(/Division by zero/);
         });
 
         test.each(['(1-2)d6', '2d0', '2d(1-3)'])('should handle negative number of dice or zero and lower sides', (expr) => {
-            const result = parser.parse(expr);
-            expect(result.error).toMatch(/Invalid number of dice or sides/);
+            const t = () => {
+                parser.parse(expr);
+            };
+            expect(t).toThrow(/Invalid number of dice or sides/);
         });
     });
 
     describe('Expression Limits', () => {
         test('should handle maximum expression length', () => {
-            const longExpr = '2d6+'.repeat(MAX_EXPRESSION_LENGTH);
-            const result = parser.parse(longExpr);
-            expect(result.error).toMatch(/Expression is too long/);
+            const t = () => {
+                const longExpr = '2d6+'.repeat(MAX_EXPRESSION_LENGTH);
+                parser.parse(longExpr);
+            };
+            expect(t).toThrow(/Expression is too long/);
         });
 
         test('should handle maximum dice count', () => {
-            const result = parser.parse(`${MAX_DICE_COUNT + 1}d6`);
-            expect(result.error).toMatch(/Too big number of dice/);
+            const t = () => {
+                parser.parse(`${MAX_DICE_COUNT + 1}d6`);
+            };
+            expect(t).toThrow(/Too big number of dice/);
         });
 
         test('should handle maximum dice sides', () => {
-            const result = parser.parse(`2d${MAX_DICE_SIDES + 1}`);
-            expect(result.error).toMatch(/Too big number of dice/);
+            const t = () => {
+                parser.parse(`2d${MAX_DICE_SIDES + 1}`);
+            };
+            expect(t).toThrow(/Too big number of dice/);
         });
     });
 

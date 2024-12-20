@@ -1,7 +1,8 @@
 const { ROLL_KEYWORD_SYNONYMS, 
     HIGHEST_ROLL_KEYWORD_SYNONYMS, 
     LOWEST_ROLL_KEYWORD_SYNONYMS, 
-    AVERAGE_ROLL_KEYWORD_SYNONYMS 
+    AVERAGE_ROLL_KEYWORD_SYNONYMS ,
+    REPEAT_EXPRESSION_KEYWORD_SYNONYMS
 } = require('../../../../config');
 
 /**
@@ -31,6 +32,11 @@ function rawExpressionFormatter(rawExpression) {
 
     resultExpression = AVERAGE_ROLL_KEYWORD_SYNONYMS.reduce(
         (str, synonym) => str.replaceAll(synonym, 'a'),
+        resultExpression
+    );
+
+    resultExpression = REPEAT_EXPRESSION_KEYWORD_SYNONYMS.reduce(
+        (str, synonym) => str.replaceAll(synonym, 'r'),
         resultExpression
     );
 

@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const {RandomMemberSelector} = require("../../business-logic/randomMember/RandomMemberSelector");
+const { RandomMemberSelector } = require("../../business-logic/randomMember/RandomMemberSelector");
 
 module.exports = {
     data: new SlashCommandBuilder()

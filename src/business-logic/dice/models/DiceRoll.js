@@ -6,7 +6,7 @@ class DiceRoll {
     }
 
     toString() {
-        return `${this.dice}: [${this.rolls.join(', ')}] = ${this.diceResult}\n`;
+        return `${this.dice}: [${this.rolls.join(', ')}] = ${this.diceResult}`;
     }
 }
 

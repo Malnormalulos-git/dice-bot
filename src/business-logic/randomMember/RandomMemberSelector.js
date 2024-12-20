@@ -1,4 +1,4 @@
-﻿const {rollDice} = require("../dice/services/diceRoller");
+﻿const { rollDice } = require("../dice/services/diceRoller");
 
 
 class RandomMemberSelector {
@@ -16,8 +16,6 @@ class RandomMemberSelector {
 
         const members = Array.from(voiceChannel.members.values());
         const focused = interaction.options.getFocused().toLowerCase().trim();
-
-        const value = interaction.options.get('exclude');
 
         const choices = members
             .map(member => ({

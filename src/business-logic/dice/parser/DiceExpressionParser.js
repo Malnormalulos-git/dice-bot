@@ -14,31 +14,23 @@ class DiceExpressionParser {
     /**
    * Processes a dice roll expression and returns ParserResult or { error }
    * @param {string} expression Dice expression input
-   * @returns {ParserResult | { error: string }} ParserResult | { error: string } result
+   * @returns {ParserResult} ParserResult | { error: string } result
    */
     parse(expression) {
-        try {
-            this.originalExpression = expression;
-            this.diceRolls = [];
-      
-            if (!expression) {
-                throw new UserError('Empty expression');
-            }
-            if (expression.length > MAX_EXPRESSION_LENGTH) {
-                throw new UserError( `Expression is too long. Maximum length is ${MAX_EXPRESSION_LENGTH}`, expression);
-            }
+        this.originalExpression = expression;
+        this.diceRolls = [];
 
-            const tokens = this.tokenize(expression);
-      
-            const result = this.parseExpression(tokens);
-            return new ParserResult(result.value, this.diceRolls);
-        } catch (error) {
-            if (error instanceof UserError) {
-                return { error: error.toString() };
-            }
-            console.error(`Unhandled error while parsing "${expression}":`, error);
-            return { error: `Congrats! You occurred unhandled error with your "${expression}"!` };
+        if (!expression) {
+            throw new UserError('Empty expression');
         }
+        if (expression.length > MAX_EXPRESSION_LENGTH) {
+            throw new UserError(`Expression is too long. Maximum length is ${MAX_EXPRESSION_LENGTH}`, expression);
+        }
+
+        const tokens = this.tokenize(expression);
+
+        const result = this.parseExpression(tokens);
+        return new ParserResult(result.value, this.diceRolls);
     }
 
     /**
@@ -83,7 +75,7 @@ class DiceExpressionParser {
                 tokens.push(new Token('parentheses', char));
             } 
             else {
-                throw new UserError(`Invalid character: "${char}" in expression "${expr}"`, expr);
+                throw new UserError(`Invalid character: "${char}"`, expr);
             }
         }
     
