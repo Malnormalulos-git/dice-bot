@@ -13,14 +13,14 @@ function outputFormatter(expressions, results) {
     let rollsList = '\n\n';
 
     expressions.forEach((expr, index) => {
-        expressionsList += `\nExpression
-            ${expressions.length === 1 
+        expressionsList += `\nExpression` +
+            `${expressions.length === 1 
                 ? '' 
-                : (index + 1)}
-            ${expr.repeat > 1 
+                : (index + 1)}` +
+            `${expr.repeat > 1 
                 ? ' x' + expr.repeat 
-                : ''}
-            : ${expr.expressionToParser}`;
+                : ''}` +
+            `: ${expr.expressionToParser}`;
     });
 
     results.forEach((result) => {
