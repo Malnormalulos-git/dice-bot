@@ -10,9 +10,11 @@ const messageWithPrefix: Event = {
             message.content.startsWith(config.PARSE_BY_MESSAGE_PREFIX)) {
             const input = message.content.slice(config.PARSE_BY_MESSAGE_PREFIX.length).trim();
 
+            const msgRef = await message.reply('\`\`\`Markdown\n*rolling dice for you❤*\`\`\`');
+
             const output = processRoll(input);
 
-            await message.reply(output);
+            await msgRef.edit(output);
         }
     }
 };

@@ -37,7 +37,8 @@ export class RandomMemberSelector {
     ): Promise<void | InteractionResponse<boolean>> {
         const invoker = interaction.member as GuildMember;
         if (!invoker?.voice?.channel) {
-            return await interaction.reply('You must be in a voice channel to use this command!');
+            await interaction.editReply('You must be in a voice channel to use this command!');
+            return;
         }
 
         if (!interaction.isChatInputCommand())
@@ -50,10 +51,11 @@ export class RandomMemberSelector {
             .filter(member => member.id !== excludedUserId && filterCallback(member as GuildMember, invoker)) as GuildMember[];
 
         if (includedMembers.length < 2) {
-            return await interaction.reply('Cannot execute this command - not enough participants!');
+            await interaction.editReply('Cannot execute this command - not enough participants!');
+            return;
         }
 
         const randomMember = includedMembers[rollDice(includedMembers.length) - 1];
-        await interaction.reply(randomMember.displayName || randomMember.user.username);
+        await interaction.editReply(randomMember.displayName || randomMember.user.username);
     }
 }

@@ -82,10 +82,7 @@ const help: Command = {
             .setFooter({text: 'Created with ❤️ for tabletop gaming enthusiasts'})
             .setTimestamp();
 
-        await interaction.reply({
-            embeds: [helpEmbed],
-            ephemeral: true
-        });
+        await interaction.editReply({embeds: [helpEmbed]});
     }
 };
 

@@ -14,7 +14,7 @@ export const roll: Command = {
 
         const output = processRoll(expression, repeat);
 
-        await interaction.reply(output);
+        await interaction.editReply(output);
     }
 };
 

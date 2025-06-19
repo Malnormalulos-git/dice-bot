@@ -1,5 +1,7 @@
-import {Events} from "discord.js";
+import {Events, MessageFlags} from "discord.js";
 import {Event} from "../types/types";
+
+const EPHEMERAL_COMMANDS = ['help'];
 
 const interactionCreate: Event = {
     name: Events.InteractionCreate,
@@ -13,18 +15,21 @@ const interactionCreate: Event = {
             }
 
             try {
+                const isEphemeral = EPHEMERAL_COMMANDS.includes(interaction.commandName);
+                await interaction.deferReply({ flags: [isEphemeral ? MessageFlags.Ephemeral : 0] });
+
                 await command.execute(interaction);
             } catch (error) {
                 console.error(error);
                 if (interaction.replied || interaction.deferred) {
                     await interaction.followUp({
                         content: 'There was an error while executing this command!',
-                        ephemeral: true
+                        flags: [MessageFlags.Ephemeral]
                     });
                 } else {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'There was an error while executing this command!',
-                        ephemeral: true
+                        flags: [MessageFlags.Ephemeral]
                     });
                 }
             }

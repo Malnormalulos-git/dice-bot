@@ -15,7 +15,7 @@ const coin: Command = {
         const result = rollDice(2);
         const filePath = path.join(__dirname, '..', '..', '..', 'assets', 'roll', 'coin',
             result === 1 ? 'heads.gif' : 'tails.gif');
-        await interaction.reply({
+        await interaction.editReply({
             content: `||\`${result === 1 ? 'Heads' : 'Tails'}\`||`,
             files: [filePath]
         });

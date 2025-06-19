@@ -16,7 +16,7 @@ const coinWithEdge: Command = {
         const result = rollDice(1000);
         if (result === 1000) {
             const filePath = path.join(__dirname, '..', '..', '..', 'assets', 'roll', 'coin', 'edge.gif');
-            await interaction.reply({
+            await interaction.editReply({
                 content: `||\`Edge\`||`,
                 files: [filePath]
             });
