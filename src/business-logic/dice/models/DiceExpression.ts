@@ -1,24 +1,23 @@
-﻿const { MAX_REPEATINGS } = require('../../../../config');
-const { UserError } = require("../../errors/UserError");
+﻿import { config } from "../../../../config";
+import { UserError } from "../../errors/UserError";
 
-class DiceExpression {
-    /**
-     * @param {Object} params Parameters for creating a DiceExpression
-     * @param {number} params.repeat Number of times to repeat the expression
-     * @param {string} params.expressionToParser The processed expression string
-     */
-    constructor({ repeat, expressionToParser }) {
+const { MAX_REPEATINGS } = config;
+
+export class DiceExpression {
+    repeat: number;
+    expressionToParser: string;
+    originalExpression?: string;
+
+    constructor({ repeat, expressionToParser, originalExpression }: DiceExpression) {
         this.repeat = repeat;
         this.expressionToParser = expressionToParser;
+        this.originalExpression = originalExpression;
     }
 
     /**
      * Creates a DiceExpression from a raw expression string
-     * @param {string} rawExpression The raw expression string to parse
-     * @param {number} defaultRepeat Number of repeats
-     * @returns {DiceExpression} A new DiceExpression instance
      */
-    static fromRawExpression(rawExpression, defaultRepeat) {
+    static fromRawExpression(rawExpression: string, defaultRepeat: number): DiceExpression {
         const match = rawExpression.match(/^r(\d+):(.+)$/);
 
         if (match) {
@@ -44,5 +43,3 @@ class DiceExpression {
         });
     }
 }
-
-module.exports = { DiceExpression };

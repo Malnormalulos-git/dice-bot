@@ -1,29 +1,27 @@
-const { rawExpressionFormatter } = require("../../utils/formatters/rawExpressionFormatter");
-const { outputFormatter } = require("../../utils/formatters/outputFormatter");
-const { DiceExpressionParser } = require("../parser/DiceExpressionParser");
-const { rollDice } = require("./diceRoller");
-const { AttachmentBuilder } = require('discord.js');
-const { DiceExpression } = require("../models/DiceExpression");
-const { UserError } = require("../../errors/UserError");
-
+import {AttachmentBuilder} from 'discord.js';
+import {DiceExpressionParser} from "../parser/DiceExpressionParser";
+import {DiceExpression} from '../models/DiceExpression';
+import {ParserResult} from "../models/ParserResult";
+import {rawExpressionFormatter} from "../../utils/formatters/rawExpressionFormatter";
+import {rollDice} from "./diceRoller";
+import {UserError} from "../../errors/UserError";
+import {outputFormatter} from "../../utils/formatters/outputFormatter";
 
 /**
  * Processes a dice roll expression/s and returns formatted output
- * @param {string} input Raw dice expression/s input
- * @param {number} globalRepeat Number of times the expression is repeated
- * @returns {string | AttachmentBuilder} Formatted string result of dice rolls
  */
-function processRoll(input, globalRepeat = 1) {
+export function processRoll(input: string, globalRepeat: number = 1): string | {
+    content: string;
+    files: AttachmentBuilder[]
+} {
     const rawExpressions = rawExpressionFormatter(input).split(';');
     const parser = new DiceExpressionParser(rollDice);
+    const allResults: (ParserResult | { error: string })[] = [];
 
-    const allResults = [];
-
-    const diceExpressions = rawExpressions.map(rawExpression => {
-        let diceExpression;
+    const diceExpressions: DiceExpression[] = rawExpressions.map((rawExpression) => {
+        let diceExpression: DiceExpression;
         try {
             diceExpression = DiceExpression.fromRawExpression(rawExpression, globalRepeat);
-
             for (let i = 0; i < diceExpression.repeat; i++) {
                 allResults.push(parser.parse(diceExpression.expressionToParser));
             }
@@ -42,12 +40,10 @@ function processRoll(input, globalRepeat = 1) {
                 expressionToParser: rawExpression
             });
 
-            allResults.push({ error: errorMessage });
+            allResults.push({error: errorMessage});
         }
         return diceExpression;
     });
 
     return outputFormatter(diceExpressions, allResults);
 }
-
-module.exports = { processRoll };

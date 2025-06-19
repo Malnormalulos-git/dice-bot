@@ -1,15 +1,15 @@
-const { DiceExpressionParser } = require("../../../../business-logic/dice/parser/DiceExpressionParser.js");
-const { MAX_DICE_COUNT, MAX_DICE_SIDES, MAX_EXPRESSION_LENGTH } = require('../../../../../config.js');
+import { config } from "../../../../../config";
+import { DiceExpressionParser } from "../../../../business-logic/dice/parser/DiceExpressionParser";
+import { describe, expect, test } from "@jest/globals";
+
+const { MAX_DICE_COUNT, MAX_DICE_SIDES, MAX_EXPRESSION_LENGTH } = config;
 
 
 describe('DiceExpressionParser', () => {
-    let parser;
     // Mock dice roller that always returns predictable values
-    const mockDiceRoller = (sides) => 4;
-
-    beforeEach(() => {
-        parser = new DiceExpressionParser(mockDiceRoller);
-    });
+    // eslint-disable-next-line
+    const mockDiceRoller = (sides: number) => 4;
+    const parser = new DiceExpressionParser(mockDiceRoller);
 
     describe('Basic Expressions', () => {
         test('should parse simple number', () => {
@@ -198,7 +198,6 @@ describe('DiceExpressionParser', () => {
 });
 
 describe('Dice Types', () => {
-    let parser;
     // Mock dice roller that returns sequence: 2, 4, 6
     const mockDiceRoller = (() => {
         const sequence = [2, 4, 6];
@@ -210,9 +209,7 @@ describe('Dice Types', () => {
         };
     })();
 
-    beforeEach(() => {
-        parser = new DiceExpressionParser(mockDiceRoller);
-    });
+    const parser = new DiceExpressionParser(mockDiceRoller);
 
     describe('Standard Dice (d)', () => {
         test('should sum all dice rolls', () => {

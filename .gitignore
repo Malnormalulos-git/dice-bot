@@ -1,3 +1,7 @@
-﻿node_modules
-.env
+node_modules
 .idea
+dist
+
+.env
+
+package-lock.json

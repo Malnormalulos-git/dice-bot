@@ -1,6 +1,7 @@
-const { Events } = require('discord.js');
+import {Events} from "discord.js";
+import {Event} from "../types/types";
 
-module.exports = {
+const interactionCreate: Event = {
     name: Events.InteractionCreate,
     async execute(interaction) {
         if (interaction.isChatInputCommand()) {
@@ -36,21 +37,14 @@ module.exports = {
             }
 
             try {
-                await command.autocomplete(interaction);
+                if (command && command.autocomplete) {
+                    await command.autocomplete(interaction);
+                }
             } catch (error) {
                 console.error(error);
-                if (interaction.replied || interaction.deferred) {
-                    await interaction.followUp({
-                        content: 'There was an error while executing this command!',
-                        ephemeral: true
-                    });
-                } else {
-                    await interaction.reply({
-                        content: 'There was an error while executing this command!',
-                        ephemeral: true
-                    });
-                }
             }
         }
-    },
+    }
 };
+
+export default interactionCreate;
