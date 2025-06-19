@@ -16,7 +16,7 @@ const interactionCreate: Event = {
 
             try {
                 const isEphemeral = EPHEMERAL_COMMANDS.includes(interaction.commandName);
-                await interaction.deferReply({ flags: [isEphemeral ? MessageFlags.Ephemeral : 0] });
+                await interaction.deferReply({flags: [isEphemeral ? MessageFlags.Ephemeral : 0]});
 
                 await command.execute(interaction);
             } catch (error) {
