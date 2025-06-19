@@ -1,8 +1,8 @@
-﻿import { Collection } from "discord.js";
+﻿import {Collection} from "discord.js";
 import * as path from "node:path";
 import * as fs from "node:fs";
-import { ClientWithCommands } from "./types/types";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import {ClientWithCommands} from "./types/types";
+import {fileURLToPath, pathToFileURL} from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

@@ -1,6 +1,6 @@
-﻿import { SlashCommandBuilder, AutocompleteInteraction, CommandInteraction } from 'discord.js';
-import { Command } from '../../types/types';
-import { RandomMemberSelector } from '../../business-logic/randomMember/RandomMemberSelector';
+﻿import {SlashCommandBuilder, AutocompleteInteraction, CommandInteraction} from 'discord.js';
+import {Command} from '../../types/types';
+import {RandomMemberSelector} from '../../business-logic/randomMember/RandomMemberSelector';
 
 const someone: Command = {
     data: new SlashCommandBuilder()

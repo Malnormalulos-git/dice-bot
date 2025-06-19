@@ -1,7 +1,7 @@
-﻿import { CommandInteraction } from 'discord.js';
-import { Command } from '../../types/types';
-import { processRoll } from '../../business-logic/dice/services/DiceRollingService';
-import { createRollDiceCommand } from "../../business-logic/utils/commandBuilders/createRollDiceCommand";
+﻿import {CommandInteraction} from 'discord.js';
+import {Command} from '../../types/types';
+import {processRoll} from '../../business-logic/dice/services/DiceRollingService';
+import {createRollDiceCommand} from "../../business-logic/utils/commandBuilders/createRollDiceCommand";
 
 export const roll: Command = {
     data: createRollDiceCommand('roll', 'Rolls your dice'),

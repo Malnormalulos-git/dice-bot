@@ -1,14 +1,14 @@
-﻿import { config } from "../../../../config";
-import { UserError } from "../../errors/UserError";
+﻿import {config} from "../../../../config";
+import {UserError} from "../../errors/UserError";
 
-const { MAX_REPEATINGS } = config;
+const {MAX_REPEATINGS} = config;
 
 export class DiceExpression {
     repeat: number;
     expressionToParser: string;
     originalExpression?: string;
 
-    constructor({ repeat, expressionToParser, originalExpression }: DiceExpression) {
+    constructor({repeat, expressionToParser, originalExpression}: DiceExpression) {
         this.repeat = repeat;
         this.expressionToParser = expressionToParser;
         this.originalExpression = originalExpression;

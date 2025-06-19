@@ -1,8 +1,8 @@
-﻿import { REST, Routes } from "discord.js";
+﻿import {REST, Routes} from "discord.js";
 import * as path from "node:path";
 import * as fs from "node:fs";
 import * as dotenv from "dotenv";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import {fileURLToPath, pathToFileURL} from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -46,7 +46,7 @@ async function loadCommands() {
 
     try {
         // delete all old commands
-        await rest.put(Routes.applicationCommands(clientId), { body: [] });
+        await rest.put(Routes.applicationCommands(clientId), {body: []});
         console.log('Successfully deleted all application commands.');
 
         // Deploy commands globally
@@ -55,7 +55,7 @@ async function loadCommands() {
         // The put method is used to fully refresh all commands globally
         const data = await rest.put(
             Routes.applicationCommands(clientId),
-            { body: commands },
+            {body: commands},
         );
 
         console.log(`Successfully reloaded ${(data as any).length} application (/) commands globally.`);

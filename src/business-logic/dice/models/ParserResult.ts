@@ -1,4 +1,4 @@
-﻿import { DiceRoll } from "./DiceRoll";
+﻿import {DiceRoll} from "./DiceRoll";
 
 export class ParserResult {
     totalSum: number;

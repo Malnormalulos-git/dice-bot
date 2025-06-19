@@ -1,4 +1,4 @@
-﻿import { ActivityType, PresenceUpdateStatus } from 'discord.js';
+﻿import {ActivityType, PresenceUpdateStatus} from 'discord.js';
 
 export const config = {
     MAX_DICE_COUNT: 5000,

@@ -1,8 +1,8 @@
-﻿import { SlashCommandBuilder, CommandInteraction } from 'discord.js';
-import { Command } from '../../types/types';
-import { rollDice } from '../../business-logic/dice/services/diceRoller';
+﻿import {SlashCommandBuilder, CommandInteraction} from 'discord.js';
+import {Command} from '../../types/types';
+import {rollDice} from '../../business-logic/dice/services/diceRoller';
 import path from 'node:path';
-import { fileURLToPath } from "node:url";
+import {fileURLToPath} from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

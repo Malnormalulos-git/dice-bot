@@ -1,6 +1,6 @@
-﻿import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
-import { Command } from '../../types/types';
-import { config } from "../../../config";
+﻿import {SlashCommandBuilder, EmbedBuilder} from 'discord.js';
+import {Command} from '../../types/types';
+import {config} from "../../../config";
 
 const {
     ROLL_KEYWORD_SYNONYMS,
@@ -79,7 +79,7 @@ const help: Command = {
                     value: '[GitHub](https://github.com/Malnormalulos-git/dice-bot.git)'
                 }
             )
-            .setFooter({ text: 'Created with ❤️ for tabletop gaming enthusiasts' })
+            .setFooter({text: 'Created with ❤️ for tabletop gaming enthusiasts'})
             .setTimestamp();
 
         await interaction.reply({

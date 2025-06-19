@@ -1,8 +1,8 @@
-import { config } from "../../../../../config";
-import { DiceExpressionParser } from "../../../../business-logic/dice/parser/DiceExpressionParser";
-import { describe, expect, test } from "@jest/globals";
+import {config} from "../../../../../config";
+import {DiceExpressionParser} from "../../../../business-logic/dice/parser/DiceExpressionParser";
+import {describe, expect, test} from "@jest/globals";
 
-const { MAX_DICE_COUNT, MAX_DICE_SIDES, MAX_EXPRESSION_LENGTH } = config;
+const {MAX_DICE_COUNT, MAX_DICE_SIDES, MAX_EXPRESSION_LENGTH} = config;
 
 
 describe('DiceExpressionParser', () => {

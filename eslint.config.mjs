@@ -43,10 +43,10 @@ export default tseslint.config(
 
             // Semicolons
             "semi": ["error", "always"],
-            "semi-spacing": ["error", { "before": false, "after": true }],
+            "semi-spacing": ["error", {"before": false, "after": true}],
 
             // Spacing and formatting rules
-            "keyword-spacing": ["error", { "before": true, "after": true }],
+            "keyword-spacing": ["error", {"before": true, "after": true}],
             "space-before-blocks": ["error", "always"],
             "space-infix-ops": "error",
             "space-before-function-paren": ["error", {
@@ -54,7 +54,7 @@ export default tseslint.config(
                 "named": "never",
                 "asyncArrow": "always"
             }],
-            "object-curly-spacing": ["error", "always"],
+            "object-curly-spacing": ["error", "never"],
             "array-bracket-spacing": ["error", "never"],
             "computed-property-spacing": ["error", "never"],
 
