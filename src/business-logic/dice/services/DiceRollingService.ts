@@ -10,7 +10,7 @@ import {outputFormatter} from "../../utils/formatters/outputFormatter";
 /**
  * Processes a dice roll expression/s and returns formatted output
  */
-export function processRoll(input: string, globalRepeat: number = 1): string | {
+export function processRoll(input: string, globalRepeat: number = 1, isCoveredBySpoiler: boolean = false): string | {
     content: string;
     files: AttachmentBuilder[]
 } {
@@ -45,5 +45,5 @@ export function processRoll(input: string, globalRepeat: number = 1): string | {
         return diceExpression;
     });
 
-    return outputFormatter(diceExpressions, allResults);
+    return outputFormatter(diceExpressions, allResults, isCoveredBySpoiler);
 }

@@ -5,12 +5,19 @@ import {ParserResult} from "../../dice/models/ParserResult";
 
 const {MAX_DISCORD_MESSAGE_LENGTH} = config;
 
+function wrapInMarkdown(output: string, isCoveredBySpoiler: boolean): string {
+    if (isCoveredBySpoiler)
+        return `||\`\`\`Markdown\n${output.trim()}\`\`\`||`;
+    return `\`\`\`Markdown\n${output.trim()}\`\`\``;
+}
+
 /**
  * Formats the output of processed dice roll expressions
  */
 export function outputFormatter(
     expressions: DiceExpression[],
-    results: (ParserResult | { error: string })[]
+    results: (ParserResult | { error: string })[],
+    isCoveredBySpoiler: boolean
 ): string | { content: string; files: AttachmentBuilder[] } {
     const totalSums = '# ' + results.map(result => ('error' in result ? result.error : result.totalSum)).join('; ');
     let expressionsList = '';
@@ -33,17 +40,18 @@ export function outputFormatter(
     });
 
     const output = totalSums + expressionsList + rollsList;
+    const wrappedOutput = wrapInMarkdown(output, isCoveredBySpoiler);
 
-    if (output.length + '```Markdown\n```'.length > MAX_DISCORD_MESSAGE_LENGTH) {
+    if (wrappedOutput.length > MAX_DISCORD_MESSAGE_LENGTH) {
         const buffer = Buffer.from(output, 'utf8');
         const attachment = new AttachmentBuilder(buffer, {name: 'detailed.txt'});
-        const content = `\`\`\`Markdown\n${(totalSums + expressionsList).trim()}\`\`\``;
+        const content = wrapInMarkdown(totalSums + expressionsList, isCoveredBySpoiler);
 
         return {
-            content: content.length > MAX_DISCORD_MESSAGE_LENGTH ? 'See detailed attachment' : content,
+            content: content.length > MAX_DISCORD_MESSAGE_LENGTH ? '`See detailed attachment`' : content,
             files: [attachment]
         };
     } else {
-        return `\`\`\`Markdown\n${output.trim()}\`\`\``;
+        return wrappedOutput;
     }
 }

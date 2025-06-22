@@ -19,5 +19,10 @@ export function createRollDiceCommand(name: string, description: string): SlashC
                 .setDescription('Repeats expression roll the entered number of times')
                 .setMinValue(1)
                 .setMaxValue(MAX_REPEATINGS)
+        )
+        .addBooleanOption(option =>
+            option
+                .setName('wrap-with-spoiler')
+                .setDescription('Wraps the result with spoiler')
         );
 }
