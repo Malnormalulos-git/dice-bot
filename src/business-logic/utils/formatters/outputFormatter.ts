@@ -11,6 +11,11 @@ function wrapInMarkdown(output: string, isCoveredBySpoiler: boolean): string {
     return `\`\`\`Markdown\n${output.trim()}\`\`\``;
 }
 
+function toFixed(value: number, precision: number = 0) {
+    const power = Math.pow(10, precision);
+    return String(Math.round(value * power) / power);
+}
+
 /**
  * Formats the output of processed dice roll expressions
  */
@@ -19,7 +24,8 @@ export function outputFormatter(
     results: (ParserResult | { error: string })[],
     isCoveredBySpoiler: boolean
 ): string | { content: string; files: AttachmentBuilder[] } {
-    const totalSums = '# ' + results.map(result => ('error' in result ? result.error : result.totalSum)).join('; ');
+    const totalSums = '# ' + results.map(result =>
+        ('error' in result ? result.error : toFixed(result.totalSum, 3))).join('; ');
     let expressionsList = '';
     let rollsList = '\n\n';
 
