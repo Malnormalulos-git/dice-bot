@@ -35,16 +35,17 @@ export class RandomMemberSelector {
         interaction: CommandInteraction,
         filterCallback: (member: GuildMember, invoker: GuildMember) => boolean = () => true
     ): Promise<void | InteractionResponse<boolean>> {
-        const invoker = interaction.member as GuildMember;
-        if (!invoker?.voice?.channel) {
-            await interaction.editReply('You must be in a voice channel to use this command!');
-            return;
-        }
-
         if (!interaction.isChatInputCommand())
             return;
 
+        const invoker = interaction.member as GuildMember;
+
         const voiceChannel = invoker.voice.channel;
+
+        if (!voiceChannel) {
+            await interaction.editReply('You must be in a voice channel to use this command!');
+            return;
+        }
         const excludedUserId = interaction.options.getString('exclude')?.trim();
 
         const includedMembers = Array.from(voiceChannel.members.values())
