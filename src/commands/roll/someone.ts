@@ -6,12 +6,13 @@ const someone: Command = {
     data: new SlashCommandBuilder()
         .setName('someone')
         .setDescription('Chooses one random participant from voice channel')
-        .addStringOption(option =>
-            option
-                .setName('exclude')
-                .setDescription('Exclude specific users from the sample')
-                .setAutocomplete(true)
-        ),
+        // .addStringOption(option =>
+        //     option
+        //         .setName('exclude')
+        //         .setDescription('Exclude specific users from the sample')
+        //         .setAutocomplete(true)
+        // )
+    ,
     async autocomplete(interaction: AutocompleteInteraction) {
         await RandomMemberSelector.handleAutocomplete(interaction);
     },

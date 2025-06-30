@@ -6,12 +6,13 @@ const someoneExceptMe: Command = {
     data: new SlashCommandBuilder()
         .setName('someone-except-me')
         .setDescription('Chooses one random participant from voice channel except you')
-        .addStringOption(option =>
-            option
-                .setName('exclude')
-                .setDescription('Exclude specific users from the sample')
-                .setAutocomplete(true)
-        ),
+        // .addStringOption(option =>
+        //     option
+        //         .setName('exclude')
+        //         .setDescription('Exclude specific users from the sample')
+        //         .setAutocomplete(true)
+        // )
+    ,
     async autocomplete(interaction: AutocompleteInteraction) {
         await RandomMemberSelector.handleAutocomplete(
             interaction,
