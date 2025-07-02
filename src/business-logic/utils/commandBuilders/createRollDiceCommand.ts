@@ -20,6 +20,11 @@ export function createRollDiceCommand(name: string, description: string): SlashC
                 .setMinValue(1)
                 .setMaxValue(MAX_REPEATINGS)
         )
+        .addStringOption(option =>
+            option
+                .setName('filter-by')
+                .setDescription('Filters results by predicate and value (e.g. >10c, <=7s)')
+        )
         .addBooleanOption(option =>
             option
                 .setName('wrap-with-spoiler')

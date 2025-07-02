@@ -2,6 +2,7 @@
 import {Command} from '../../types/types';
 import {processRoll} from '../../business-logic/dice/services/DiceRollingService';
 import {createRollDiceCommand} from "../../business-logic/utils/commandBuilders/createRollDiceCommand";
+import {ParserResultsFilter} from "../../business-logic/dice/models/ParserResultsFilter";
 
 export const roll: Command = {
     data: createRollDiceCommand('roll', 'Rolls your dice'),
@@ -13,7 +14,11 @@ export const roll: Command = {
         const repeat = interaction.options.getNumber('repeat') || 1;
         const isCoveredBySpoiler = interaction.options.getBoolean('cover-up-with-spoiler') || false;
 
-        const output = processRoll(expression, repeat, isCoveredBySpoiler);
+        const filterExpression = interaction.options.getString('filter-by') || null;
+        const filter =
+            filterExpression ? ParserResultsFilter.fromExpression(filterExpression) : null;
+
+        const output = processRoll(expression, repeat, isCoveredBySpoiler, filter);
 
         await interaction.editReply(output);
     }

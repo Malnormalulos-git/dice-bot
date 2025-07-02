@@ -6,27 +6,40 @@ import {rawExpressionFormatter} from "../../utils/formatters/rawExpressionFormat
 import {rollDice} from "./diceRoller";
 import {UserError} from "../../errors/UserError";
 import {outputFormatter} from "../../utils/formatters/outputFormatter";
+import {ParserResultsFilter} from "../models/ParserResultsFilter";
 
 /**
- * Processes a dice roll expression/s and returns formatted output
+ * Processes a die roll expression/s and returns formatted output
  */
-export function processRoll(input: string, globalRepeat: number = 1, isCoveredBySpoiler: boolean = false): string | {
+export function processRoll(
+    input: string,
+    globalRepeat: number = 1,
+    isCoveredBySpoiler: boolean = false,
+    globalFilter: ParserResultsFilter | null = null): string | {
     content: string;
     files: AttachmentBuilder[]
 } {
     const rawExpressions = rawExpressionFormatter(input).split(';');
     const parser = new DiceExpressionParser(rollDice);
-    const allResults: (ParserResult | { error: string })[] = [];
 
-    const diceExpressions: DiceExpression[] = rawExpressions.map((rawExpression) => {
+    const processedExpressions: Array<{
+        expression: DiceExpression;
+        results: (ParserResult | { error: string })[];
+    }> = [];
+
+    for (const rawExpression of rawExpressions) {
         let diceExpression: DiceExpression;
+        const results: (ParserResult | { error: string })[] = [];
+
         try {
-            diceExpression = DiceExpression.fromRawExpression(rawExpression, globalRepeat);
+            diceExpression = DiceExpression.fromRawExpression(rawExpression, globalRepeat, globalFilter);
+
             for (let i = 0; i < diceExpression.repeat; i++) {
-                allResults.push(parser.parse(diceExpression.expressionToParser));
+                const result = parser.parse(diceExpression.expressionToParser);
+                results.push(result);
             }
         } catch (error) {
-            let errorMessage = '';
+            let errorMessage: string;
 
             if (error instanceof UserError) {
                 errorMessage = error.toString();
@@ -40,10 +53,14 @@ export function processRoll(input: string, globalRepeat: number = 1, isCoveredBy
                 expressionToParser: rawExpression
             });
 
-            allResults.push({error: errorMessage});
+            results.push({error: errorMessage});
         }
-        return diceExpression;
-    });
 
-    return outputFormatter(diceExpressions, allResults, isCoveredBySpoiler);
+        processedExpressions.push({
+            expression: diceExpression,
+            results: results
+        });
+    }
+
+    return outputFormatter(processedExpressions, isCoveredBySpoiler);
 }
