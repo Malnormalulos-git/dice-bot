@@ -50,10 +50,13 @@ export function outputFormatter(
             const filteredResult = expr.filter.apply(totalSums);
 
             if (expr.filter.filterType === FilterType.display) {
-                finalResults
-                    .push((filteredResult as number[])
-                        .map(v => toFixed(v, 3))
-                        .join('; '));
+                const asArray = filteredResult as number[];
+
+                if (asArray.length > 0)
+                    finalResults
+                        .push((asArray)
+                            .map(v => toFixed(v, 3))
+                            .join('; '));
             } else {
                 finalResults.push(toFixed(filteredResult as number, 3));
             }
