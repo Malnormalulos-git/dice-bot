@@ -51,15 +51,23 @@ export class ParserResultsFilter {
         if (match) {
             try {
                 const comparerStr = match[1];
-                const value = parseInt(match[2]);
+                const referenceValue = parseInt(match[2]);
                 const typeStr = match[3];
 
-                const filterCompairer = mapEnum(FilterCompairerType, comparerStr) || FilterCompairerType.greaterEqualThan;
                 const filterType: FilterType = mapEnum(FilterType, typeStr) || FilterType.display;
 
-                return new ParserResultsFilter(value, filterCompairer, filterType);
+                const mappedComparer = mapEnum(FilterCompairerType, comparerStr);
+                if (!mappedComparer && comparerStr?.length == 2) {
+                    throw new UserError(`Invalid filter comparer: ${comparerStr}`);
+                }
+                const filterCompairer = mappedComparer || FilterCompairerType.greaterEqualThan;
+
+                return new ParserResultsFilter(referenceValue, filterCompairer, filterType);
             } catch (error) {
-                throw new UserError(`Please check syntax rules for the filter ${filterExpression}`);
+                if (error instanceof UserError)
+                    throw error;
+                else
+                    throw new UserError(`Please check syntax rules for the filter ${filterExpression}`);
             }
         }
 
@@ -70,7 +78,7 @@ export class ParserResultsFilter {
      * Checks whether a value satisfies the filter condition
      */
     matches(value: number): boolean {
-        if (!this.referenceValue)
+        if (this.referenceValue === null)
             return true;
         return comparerMap[this.filterCompairer](value, this.referenceValue);
     }

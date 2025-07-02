@@ -1,5 +1,6 @@
 import {Events, MessageFlags} from "discord.js";
 import {Event} from "../types/types";
+import {UserError} from "../business-logic/errors/UserError";
 
 const EPHEMERAL_COMMANDS = ['help'];
 
@@ -20,15 +21,23 @@ const interactionCreate: Event = {
 
                 await command.execute(interaction);
             } catch (error) {
-                console.error(error);
+                let errorMessage: string;
+                if (error instanceof UserError) {
+                    errorMessage = error.toString();
+                }
+                else {
+                    console.error(error);
+                    errorMessage = 'There was an error while executing this command!';
+                }
+
                 if (interaction.replied || interaction.deferred) {
                     await interaction.followUp({
-                        content: 'There was an error while executing this command!',
+                        content: errorMessage,
                         flags: [MessageFlags.Ephemeral]
                     });
                 } else {
                     await interaction.editReply({
-                        content: 'There was an error while executing this command!',
+                        content: errorMessage,
                         flags: [MessageFlags.Ephemeral]
                     });
                 }
