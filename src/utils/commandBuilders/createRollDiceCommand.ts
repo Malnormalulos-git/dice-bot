@@ -1,5 +1,5 @@
 ﻿import {SlashCommandBuilder, SlashCommandOptionsOnlyBuilder} from 'discord.js';
-import {config} from '../../../../config';
+import {config} from '../../../config';
 
 const {MAX_REPEATINGS} = config;
 

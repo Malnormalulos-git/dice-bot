@@ -1,7 +1,7 @@
 ﻿import {CommandInteraction} from 'discord.js';
 import {Command} from '../../types/types';
 import {processRoll} from '../../business-logic/dice/services/DiceRollingService';
-import {createRollDiceCommand} from "../../business-logic/utils/commandBuilders/createRollDiceCommand";
+import {createRollDiceCommand} from "../../utils/commandBuilders/createRollDiceCommand";
 import {ParserResultsFilter} from "../../business-logic/dice/models/ParserResultsFilter";
 
 export const roll: Command = {

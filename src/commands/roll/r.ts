@@ -1,6 +1,6 @@
 ﻿import {Command} from '../../types/types';
 import {roll} from './roll';
-import {createRollDiceCommand} from "../../business-logic/utils/commandBuilders/createRollDiceCommand";
+import {createRollDiceCommand} from "../../utils/commandBuilders/createRollDiceCommand";
 
 const r: Command = {
     data: createRollDiceCommand('r', 'Same as /roll, just shorter!'),
