@@ -1,11 +1,9 @@
-import {AttachmentBuilder} from 'discord.js';
 import {DiceExpressionParser} from "../parser/DiceExpressionParser";
 import {DiceExpression} from '../models/DiceExpression';
 import {ParserResult} from "../models/ParserResult";
 import {rawExpressionFormatter} from "../../utils/formatters/rawExpressionFormatter";
 import {rollDice} from "./diceRoller";
 import {UserError} from "../../errors/UserError";
-import {outputFormatter} from "../../utils/formatters/outputFormatter";
 import {ParserResultsFilter} from "../models/ParserResultsFilter";
 
 /**
@@ -14,11 +12,11 @@ import {ParserResultsFilter} from "../models/ParserResultsFilter";
 export function processRoll(
     input: string,
     globalRepeat: number = 1,
-    isCoveredBySpoiler: boolean = false,
-    globalFilter: ParserResultsFilter | null = null): string | {
-    content: string;
-    files: AttachmentBuilder[]
-} {
+    globalFilter: ParserResultsFilter | null = null
+): Array<{
+    expression: DiceExpression;
+    results: (ParserResult | { error: string })[];
+}> {
     const rawExpressions = rawExpressionFormatter(input).split(';');
     const parser = new DiceExpressionParser(rollDice);
 
@@ -62,5 +60,5 @@ export function processRoll(
         });
     }
 
-    return outputFormatter(processedExpressions, isCoveredBySpoiler);
+    return processedExpressions;
 }

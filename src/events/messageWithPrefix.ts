@@ -2,6 +2,7 @@
 import {Event} from '../types/types';
 import {processRoll} from '../business-logic/dice/services/DiceRollingService';
 import {config} from "../../config";
+import {outputFormatter} from "../business-logic/utils/formatters/outputFormatter";
 
 const messageWithPrefix: Event = {
     name: Events.MessageCreate,
@@ -12,7 +13,9 @@ const messageWithPrefix: Event = {
 
             const msgRef = await message.reply('```Markdown\n*rolling dice for you❤*```');
 
-            const output = processRoll(input);
+            const processesRolls = processRoll(input);
+
+            const output = outputFormatter(processesRolls);
 
             await msgRef.edit(output);
         }

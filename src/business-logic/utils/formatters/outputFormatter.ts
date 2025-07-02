@@ -22,7 +22,7 @@ function toFixed(value: number, precision: number = 0) {
  */
 export function outputFormatter(
     processedExpressions: Array<{ expression: DiceExpression; results: (ParserResult | { error: string })[] }>,
-    isCoveredBySpoiler: boolean
+    isCoveredBySpoiler: boolean = false
 ): string | { content: string; files: AttachmentBuilder[] } {
     const finalResults: string[] = [];
     let expressionsList = '';
