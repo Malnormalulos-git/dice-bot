@@ -1,7 +1,6 @@
 ﻿import {config} from "../../../../config";
 import {UserError} from "../../errors/UserError";
-import {FilterCompairerType, FilterType, ParserResultsFilter} from "./ParserResultsFilter";
-import mapEnum from "../../utils/mapEnum";
+import {ParserResultsFilter} from "./ParserResultsFilter";
 
 const {MAX_REPEATINGS} = config;
 
