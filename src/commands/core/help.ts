@@ -164,19 +164,19 @@ const helpPages = [
         value: '7'
     },
     {
-        title: '🔧 Command Options & Limits',
+        title: '🔧 Roll Command Options & Limits',
         content: '**Available Command Options:**\n' +
             '• `expression` - Dice expression (required)\n' +
             '• `repeat` - Global repetition count\n' +
             '• `filter-by` - Global filter for results\n' +
-            '• `wrap-with-spoiler` - Hide results with spoiler tags\n\n' +
+            '• `hide` - Hide results with spoiler tags\n\n' +
             '**System Limits:**\n' +
             `• Maximum dice per roll: ${MAX_DICE_COUNT}\n` +
             `• Maximum sides per die: ${MAX_DICE_SIDES}\n` +
             `• Maximum repetitions: ${MAX_REPEATINGS}\n` +
             '• Maximum expression length: 100 characters\n\n' +
             '**Spoiler Example:**\n' +
-            '`/roll d20 wrap-with-spoiler:true` - Hide result',
+            '`/roll:d20 hide:true` - Hide result',
         value: '8'
     }
 ];

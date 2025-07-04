@@ -27,7 +27,7 @@ export function createRollDiceCommand(name: string, description: string): SlashC
         )
         .addBooleanOption(option =>
             option
-                .setName('wrap-with-spoiler')
+                .setName('hide')
                 .setDescription('Wraps the result with spoiler')
         );
 }

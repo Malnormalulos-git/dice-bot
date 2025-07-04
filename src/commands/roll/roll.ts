@@ -13,7 +13,7 @@ export const roll: Command = {
 
         const expression = interaction.options.getString('expression')!;
         const repeat = interaction.options.getNumber('repeat') || 1;
-        const isCoveredBySpoiler = interaction.options.getBoolean('cover-up-with-spoiler') || false;
+        const isCoveredBySpoiler = interaction.options.getBoolean('hide') || false;
 
         const filterExpression = interaction.options.getString('filter-by') || null;
         const filter =
