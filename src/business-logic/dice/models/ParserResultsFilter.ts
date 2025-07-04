@@ -8,6 +8,7 @@ export enum FilterCompairerType {
     greaterEqualThan = '>=',
     equal = '='
 }
+
 const comparerMap: Record<FilterCompairerType, (value: number, reference: number) => boolean> = {
     [FilterCompairerType.lessThan]: (value: number, reference: number) => value < reference,
     [FilterCompairerType.lessEqualThan]: (value: number, reference: number) => value <= reference,
@@ -21,6 +22,7 @@ export enum FilterType {
     sum = 's',
     count = 'c'
 }
+
 const typeMap: Record<FilterType, (matchingResults: number[]) => number | number[]> = {
     [FilterType.display]: (matchingResults: number[]) => matchingResults,
     [FilterType.sum]: (matchingResults: number[]) => matchingResults.reduce((sum, value) => sum + value, 0),
@@ -62,7 +64,11 @@ export class ParserResultsFilter {
                 }
                 const filterCompairer = mappedComparer || FilterCompairerType.greaterEqualThan;
 
-                return new ParserResultsFilter(referenceValue, filterCompairer, filterType);
+                return new ParserResultsFilter(
+                    isNaN(referenceValue)
+                        ? null
+                        : referenceValue
+                    , filterCompairer, filterType);
             } catch (error) {
                 if (error instanceof UserError)
                     throw error;

@@ -115,5 +115,5 @@ function getFilterDescription(filter: ParserResultsFilter): string {
     const comparerDesc = comparerMap[filter.filterCompairer] || filter.filterCompairer;
     const typeDesc = typeMap[filter.filterType] || filter.filterType;
 
-    return `${typeDesc}${filter.referenceValue ? ` ${comparerDesc} ${filter.referenceValue}` : ''}`;
+    return `${typeDesc}${filter.referenceValue != null ? ` ${comparerDesc} ${filter.referenceValue}` : ''}`;
 }
