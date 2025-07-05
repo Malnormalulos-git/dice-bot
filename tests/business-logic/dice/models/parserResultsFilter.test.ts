@@ -87,7 +87,7 @@ describe('ParserResultsFilter', () => {
         test('should parse filter without value (comparer only)', () => {
             const filter = ParserResultsFilter.fromExpression('>s');
 
-            expect(filter?.referenceValue).toBeNaN();
+            expect(filter?.referenceValue).toBeNull();
             expect(filter?.filterCompairer).toBe(FilterCompairerType.greaterThan);
             expect(filter?.filterType).toBe(FilterType.sum);
         });
