@@ -32,6 +32,26 @@ describe('DiceExpressionParser', () => {
         });
     });
 
+    describe('Expressions Fractional Numbers', () => {
+        test('should parse fractional numbers', () => {
+            const result = parser.parse('1.5');
+            expect(result.totalSum).toBe(1.5);
+            expect(result.rollOutputs).toHaveLength(0);
+        });
+
+        test('should trunc fractional part of numbers at roll expression', () => {
+            const result = parser.parse('2.5d6.7');
+            expect(result.totalSum).toBe(8);
+            expect(result.rollOutputs[0].dice).toBe('2d6');
+        });
+
+        test('should properly calculate fractional numbers', () => {
+            const result = parser.parse('1.7*2.5');
+            expect(result.totalSum).toBe(4.25);
+            expect(result.rollOutputs).toHaveLength(0);
+        });
+    });
+
     describe('Complex Expressions', () => {
         test('should handle addition', () => {
             const result = parser.parse('2d6+5');
@@ -89,7 +109,7 @@ describe('DiceExpressionParser', () => {
             const t = () => {
                 parser.parse(expr);
             };
-            expect(t).toThrow(/Expression cannot end with an operator or 'd'/);
+            expect(t).toThrow(/Expression cannot end with an operator or dice/);
         });
 
         test('should handle invalid subexpressions', () => {
@@ -139,6 +159,27 @@ describe('DiceExpressionParser', () => {
                 parser.parse(expr);
             };
             expect(t).toThrow(/Invalid number of dice or sides/);
+        });
+
+        test('should handle numbers that starts with decimal point', () => {
+            const t = () => {
+                parser.parse('.2d2');
+            };
+            expect(t).toThrow(/Number cannot start with decimal point/);
+        });
+
+        test('should handle numbers that includes many decimal points', () => {
+            const t = () => {
+                parser.parse('0.2.d2');
+            };
+            expect(t).toThrow(/Too many decimal points/);
+        });
+
+        test('should handle numbers that ends with decimal point', () => {
+            const t = () => {
+                parser.parse('2.d2');
+            };
+            expect(t).toThrow(/Number cannot end with decimal point./);
         });
     });
 

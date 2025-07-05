@@ -7,6 +7,41 @@ import {Token} from "../models/Token";
 
 const {MAX_DICE_COUNT, MAX_DICE_SIDES, MAX_EXPRESSION_LENGTH} = config;
 
+const DIGITS = '0123456789.';
+const OPERATORS = '+-*/';
+const DICE_TYPES = 'dhla';
+const PARENTHESES = '()';
+
+class CurrentNumber {
+    private value: string;
+    private readonly expr: string;
+
+    constructor(expr: string) {
+        this.value = '';
+        this.expr = expr;
+    }
+
+    appendCurrent(digit: string) {
+        if (this.value.length === 0 && digit === '.') {
+            throw new UserError('Number cannot start with decimal point.', this.expr);
+        } else if (this.value.includes('.') && digit === '.') {
+            throw new UserError('Too many decimal points', this.expr);
+        }
+        this.value += digit;
+    }
+    popCurrent(){
+        if (this.value.endsWith('.')) {
+            throw new UserError('Number cannot end with decimal point.', this.expr);
+        }
+        const result = parseFloat(this.value);
+        this.value = '';
+        return result;
+    }
+    isEmpty(){
+        return this.value.length === 0;
+    }
+}
+
 export class DiceExpressionParser {
     diceRoller: (numOfSides: number) => number;
     diceRolls: DiceRoll[];
@@ -42,23 +77,21 @@ export class DiceExpressionParser {
      */
     tokenize(expr: string): Token[] {
         const tokens: Token[] = [];
-        let current = '';
+        const current = new CurrentNumber(expr);
 
         for (let i = 0; i < expr.length; i++) {
             const char = expr[i];
 
-            if ('0123456789'.includes(char)) {
-                current += char;
-            } else if ('dhla'.includes(char)) {
+            if (DIGITS.includes(char)) {
+                current.appendCurrent(char);
+            } else if (DICE_TYPES.includes(char)) {
                 if (tokens.length === 0 || tokens[tokens.length - 1].value !== ')') {
-                    tokens.push(new Token('number', current ? parseInt(current) : 1));
+                    tokens.push(new Token('number', !current.isEmpty() ? current.popCurrent() : 1));
                 }
                 tokens.push(new Token('dice', char));
-                current = '';
-            } else if ('+-*/'.includes(char)) {
-                if (current) {
-                    tokens.push(new Token('number', parseInt(current)));
-                    current = '';
+            } else if (OPERATORS.includes(char)) {
+                if (!current.isEmpty()) {
+                    tokens.push(new Token('number', current.popCurrent()));
                 }
                 if (
                     tokens.length === 0 ||
@@ -68,10 +101,9 @@ export class DiceExpressionParser {
                     throw new UserError(`Invalid operator placement: "${char}"`, expr);
                 }
                 tokens.push(new Token('operator', char));
-            } else if ('()'.includes(char)) {
-                if (current) {
-                    tokens.push(new Token('number', parseInt(current)));
-                    current = '';
+            } else if (PARENTHESES.includes(char)) {
+                if (!current.isEmpty()) {
+                    tokens.push(new Token('number', current.popCurrent()));
                 }
                 tokens.push(new Token('parentheses', char));
             } else {
@@ -79,10 +111,11 @@ export class DiceExpressionParser {
             }
         }
 
-        if (current) {
-            tokens.push(new Token('number', parseInt(current)));
-        } else if (tokens.length > 0 && '+-*/d'.includes(tokens[tokens.length - 1].value as string)) {
-            throw new UserError(`Expression cannot end with an operator or 'd': "${tokens[tokens.length - 1].value}"`, expr);
+        if (!current.isEmpty()) {
+            tokens.push(new Token('number', current.popCurrent()));
+        } else if (tokens.length > 0 &&
+            (OPERATORS + DICE_TYPES).includes(tokens[tokens.length - 1].value as string)) {
+            throw new UserError(`Expression cannot end with an operator or dice: "${tokens[tokens.length - 1].value}"`, expr);
         }
 
         return tokens;
@@ -164,9 +197,9 @@ export class DiceExpressionParser {
                 result[i + 1].type === 'dice' &&
                 result[i + 2].type === 'number'
             ) {
-                const numOfDice = result[i].value as number;
+                const numOfDice = Math.trunc(result[i].value as number);
                 const dice = result[i + 1].value as string;
-                const numOfSides = result[i + 2].value as number;
+                const numOfSides = Math.trunc(result[i + 2].value as number);
 
                 if (numOfDice < 0 || numOfSides < 1) {
                     throw new UserError(`Invalid number of dice or sides: "${numOfDice + dice + numOfSides}"`,
