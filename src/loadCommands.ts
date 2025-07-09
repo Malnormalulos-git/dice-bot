@@ -45,10 +45,6 @@ async function loadCommands() {
     const rest = new REST().setToken(token);
 
     try {
-        // delete all old commands
-        await rest.put(Routes.applicationCommands(clientId), {body: []});
-        console.log('Successfully deleted all application commands.');
-
         // Deploy commands globally
         console.log(`Started refreshing ${commands.length} application (/) commands globally.`);
 
