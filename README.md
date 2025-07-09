@@ -19,7 +19,7 @@
 
 ### Coin Flipping
 - Regular coin toss (heads/tails)
-- Coin with edge (1/1000 chance of landing on edge)
+- Coin with edge (adjustable chance of landing on edge)
 - Animated GIF results with spoiler tags
 
 ### Random Member Selection
@@ -171,6 +171,9 @@ Customize bot behavior in `config.ts`:
 - `MAX_EXPRESSION_LENGTH` - Maximum expression length (default: 100)
 - `MAX_DISCORD_MESSAGE_LENGTH` - Message length before file output (default: 1900)
 
+### Probability adjustments
+- `COIN_EDGE_CHANCE` - chance of coin edge will be 1/`COIN_EDGE_CHANCE` (default: 100)
+
 ### Language Synonyms
 - `ROLL_KEYWORD_SYNONYMS` - Alternatives for 'd' (default: `['dice', 'д', 'в', 'к']`)
 - `HIGHEST_ROLL_KEYWORD_SYNONYMS` - Alternatives for 'h' (default: `['high', 'highest', 'best', 'b']`)
@@ -187,6 +190,7 @@ Customize bot behavior in `config.ts`:
 ### Bot Appearance
 - `BOT_STATUS` - Bot's presence status
 - `BOT_ACTIVITY` - Bot's activity and signature
+- `EMBED_COLOR` - Bot's embeds color
 
 ## Examples & Use Cases
 

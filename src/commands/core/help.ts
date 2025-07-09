@@ -21,7 +21,9 @@ const {
     ENABLE_PARSING_BY_MESSAGE_WITH_PREFIX,
     MAX_DICE_COUNT,
     MAX_DICE_SIDES,
-    MAX_REPEATINGS
+    MAX_REPEATINGS,
+    EMBED_COLOR,
+    COIN_EDGE_CHANCE
 } = config;
 
 const formatSynonyms = (synonyms: string[]) => synonyms.map(s => `\`${s}\``).join(', ');
@@ -50,10 +52,10 @@ const helpPages = [
         title: '🟡 Coin Commands',
         content: '**Coin Toss Commands:**\n' +
             '`/coin` - Toss a regular coin (heads or tails)\n' +
-            '`/coin-with-edge` - Toss a coin with 1/1000 chance of landing on edge\n\n' +
+            `\`/coin-with-edge\` - Toss a coin with 1/${COIN_EDGE_CHANCE} chance of landing on edge\n\n` +
             '**How it works:**\n' +
             '• Regular coin flip uses a 2-sided die roll\n' +
-            '• Edge coin uses a 1000-sided die roll\n' +
+            `• Edge coin uses a ${COIN_EDGE_CHANCE}-sided die roll\n` +
             '• Results are displayed with animated GIFs\n' +
             '• Results are wrapped in spoiler tags for suspense\n\n' +
             '**Examples:**\n' +
@@ -188,7 +190,7 @@ const help: Command = {
     async execute(interaction: CommandInteraction) {
         const createHelpEmbed = (pageIndex: number = 0) => {
             return new EmbedBuilder()
-                .setColor('#5865F2')
+                .setColor(EMBED_COLOR)
                 .setTitle('🎲 Dice Rolling Bot - Help')
                 .addFields(
                     {

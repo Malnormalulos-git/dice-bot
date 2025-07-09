@@ -5,6 +5,7 @@
     StringSelectMenuBuilder, StringSelectMenuOptionBuilder
 } from 'discord.js';
 import {rollDice} from '../dice/services/diceRoller';
+import {config} from "../../../config";
 
 export class RandomMemberSelector {
     /**
@@ -56,7 +57,7 @@ export class RandomMemberSelector {
 
         const createEmbed = (member: GuildMember) => {
             return new EmbedBuilder()
-                .setColor('#5865F2')
+                .setColor(config.EMBED_COLOR)
                 .addFields(
                     {
                         name: member.displayName || member.user.username,

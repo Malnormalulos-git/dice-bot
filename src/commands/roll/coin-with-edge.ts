@@ -4,6 +4,7 @@ import {rollDice} from '../../business-logic/dice/services/diceRoller';
 import coin from './coin';
 import path from 'node:path';
 import {fileURLToPath} from "node:url";
+import {config} from "../../../config";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -11,10 +12,10 @@ const __dirname = path.dirname(__filename);
 const coinWithEdge: Command = {
     data: new SlashCommandBuilder()
         .setName('coin-with-edge')
-        .setDescription('Toss a coin! (1/1000 chance of edge)'),
+        .setDescription(`Toss a coin! (1/${config.COIN_EDGE_CHANCE} chance of edge)`),
     async execute(interaction: CommandInteraction) {
-        const result = rollDice(1000);
-        if (result === 1000) {
+        const result = rollDice(config.COIN_EDGE_CHANCE);
+        if (result === config.COIN_EDGE_CHANCE) {
             const filePath = path.join(__dirname, '..', '..', '..', 'assets', 'roll', 'coin', 'edge.gif');
             await interaction.editReply({
                 content: `||\`Edge\`||`,
