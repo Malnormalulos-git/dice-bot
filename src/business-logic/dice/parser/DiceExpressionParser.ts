@@ -2,7 +2,7 @@ import {config} from "../../../../config";
 import {UserError} from "../../errors/UserError";
 import {DiceRoll} from "../models/DiceRoll";
 import {ParserResult} from "../models/ParserResult";
-import {Token} from "../models/Token";
+import {Token, TokenType} from "../models/Token";
 
 
 const {MAX_DICE_COUNT, MAX_DICE_SIDES, MAX_EXPRESSION_LENGTH} = config;
@@ -86,33 +86,33 @@ export class DiceExpressionParser {
                 current.appendCurrent(char);
             } else if (DICE_TYPES.includes(char)) {
                 if (tokens.length === 0 || tokens[tokens.length - 1].value !== ')') {
-                    tokens.push(new Token('number', !current.isEmpty() ? current.popCurrent() : 1));
+                    tokens.push(new Token(TokenType.NUMBER, !current.isEmpty() ? current.popCurrent() : 1));
                 }
-                tokens.push(new Token('dice', char));
+                tokens.push(new Token(TokenType.DICE, char));
             } else if (OPERATORS.includes(char)) {
                 if (!current.isEmpty()) {
-                    tokens.push(new Token('number', current.popCurrent()));
+                    tokens.push(new Token(TokenType.NUMBER, current.popCurrent()));
                 }
                 if (
                     tokens.length === 0 ||
-                    tokens[tokens.length - 1].type === 'operator' ||
-                    tokens[tokens.length - 1].type === 'dice'
+                    tokens[tokens.length - 1].type === TokenType.OPERATOR ||
+                    tokens[tokens.length - 1].type === TokenType.DICE
                 ) {
                     throw new UserError(`Invalid operator placement: "${char}"`, expr);
                 }
-                tokens.push(new Token('operator', char));
+                tokens.push(new Token(TokenType.OPERATOR, char));
             } else if (PARENTHESES.includes(char)) {
                 if (!current.isEmpty()) {
-                    tokens.push(new Token('number', current.popCurrent()));
+                    tokens.push(new Token(TokenType.NUMBER, current.popCurrent()));
                 }
-                tokens.push(new Token('parentheses', char));
+                tokens.push(new Token(TokenType.PARENTHES, char));
             } else {
                 throw new UserError(`Invalid character: "${char}"`, expr);
             }
         }
 
         if (!current.isEmpty()) {
-            tokens.push(new Token('number', current.popCurrent()));
+            tokens.push(new Token(TokenType.NUMBER, current.popCurrent()));
         } else if (tokens.length > 0 &&
             (OPERATORS + DICE_TYPES).includes(tokens[tokens.length - 1].value as string)) {
             throw new UserError(`Expression cannot end with an operator or dice: "${tokens[tokens.length - 1].value}"`, expr);
@@ -125,7 +125,7 @@ export class DiceExpressionParser {
      * Parses the tokenized expression and returns the result
      */
     parseExpression(tokens: Token[]): Token {
-        if (tokens[0].type === 'operator' || tokens[tokens.length - 1].type === 'operator') {
+        if (tokens[0].type === TokenType.OPERATOR || tokens[tokens.length - 1].type === TokenType.OPERATOR) {
             throw new UserError('Subexpression starts or ends on operator', this.originalExpression);
         }
 
@@ -149,7 +149,7 @@ export class DiceExpressionParser {
         const result = [...tokens];
 
         for (let i = 0; i < result.length; i++) {
-            if (result[i].type === 'parentheses') {
+            if (result[i].type === TokenType.PARENTHES) {
                 if (result[i].value === '(') {
                     stack.push(i);
                 } else {
@@ -192,10 +192,10 @@ export class DiceExpressionParser {
 
         for (let i = 0; i < result.length; i++) {
             if (
-                result[i].type === 'number' &&
+                result[i].type === TokenType.NUMBER &&
                 i + 2 < result.length &&
-                result[i + 1].type === 'dice' &&
-                result[i + 2].type === 'number'
+                result[i + 1].type === TokenType.DICE &&
+                result[i + 2].type === TokenType.NUMBER
             ) {
                 const numOfDice = Math.trunc(result[i].value as number);
                 const dice = result[i + 1].value as string;
@@ -222,7 +222,7 @@ export class DiceExpressionParser {
                 const diceResult = diceTypes[dice](rolls);
                 const diceRoll = new DiceRoll(`${numOfDice + dice + numOfSides}`, rolls, diceResult);
                 this.diceRolls.push(diceRoll);
-                result.splice(i, 3, new Token('number', diceRoll.diceResult));
+                result.splice(i, 3, new Token(TokenType.NUMBER, diceRoll.diceResult));
             }
         }
 
@@ -242,7 +242,7 @@ export class DiceExpressionParser {
         };
 
         for (let i = 0; i < result.length; i++) {
-            if (result[i].type === 'operator' && operators.includes(result[i].value as string)) {
+            if (result[i].type === TokenType.OPERATOR && operators.includes(result[i].value as string)) {
                 const operator = result[i].value as string;
                 const left = result[i - 1].value as number;
                 const right = result[i + 1].value as number;
@@ -257,7 +257,7 @@ export class DiceExpressionParser {
                     throw new UserError('Invalid calculation result', this.originalExpression);
                 }
 
-                result.splice(i - 1, 3, new Token('number', res));
+                result.splice(i - 1, 3, new Token(TokenType.NUMBER, res));
                 i--;
             }
         }

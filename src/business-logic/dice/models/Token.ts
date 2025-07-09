@@ -1,8 +1,15 @@
-﻿export class Token {
-    type: string;
+﻿export enum TokenType {
+    NUMBER,
+    DICE,
+    OPERATOR,
+    PARENTHES
+}
+
+export class Token {
+    type: TokenType;
     value: number | string;
 
-    constructor(type: string, value: number | string) {
+    constructor(type: TokenType, value: number | string) {
         this.type = type;
         this.value = value;
     }
