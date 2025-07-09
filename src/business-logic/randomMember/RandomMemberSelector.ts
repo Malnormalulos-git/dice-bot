@@ -45,7 +45,8 @@ export class RandomMemberSelector {
         const exclude = interaction.options.getBoolean('exclude') || false;
 
         const includedMembers = Array.from(voiceChannel.members.values())
-            .filter(member => filterCallback(member as GuildMember, invoker)) as GuildMember[];
+            .filter(member => !member.user.bot &&
+                filterCallback(member as GuildMember, invoker)) as GuildMember[];
 
         if (includedMembers.length < 2) {
             await interaction.editReply({
