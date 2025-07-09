@@ -240,12 +240,12 @@ const help: Command = {
             });
         });
 
-        collector.on('end', async () => {
-            try {
+        collector.on('end', async (collected) => {
+            if (collected.size === 0) {
                 await interaction.editReply({
+                    content: 'You did not select any users in time.',
                     components: []
                 });
-            } catch (error) {
             }
         });
     }

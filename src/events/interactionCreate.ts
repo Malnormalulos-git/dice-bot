@@ -36,7 +36,7 @@ const interactionCreate: Event = {
                         flags: [MessageFlags.Ephemeral]
                     });
                 } else {
-                    await interaction.editReply({
+                    await interaction.reply({
                         content: errorMessage,
                         flags: [MessageFlags.Ephemeral]
                     });
