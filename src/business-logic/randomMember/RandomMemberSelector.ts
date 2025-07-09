@@ -1,31 +1,23 @@
-﻿import {AutocompleteInteraction, CommandInteraction, GuildMember, InteractionResponse} from 'discord.js';
+﻿import {
+    ActionRowBuilder,
+    CommandInteraction, ComponentType, EmbedBuilder,
+    GuildMember,
+    StringSelectMenuBuilder, StringSelectMenuOptionBuilder
+} from 'discord.js';
 import {rollDice} from '../dice/services/diceRoller';
 
 export class RandomMemberSelector {
     /**
-     * Handles autocomplete interaction for member selection
+     * Returns random member from the sample
      */
-    static async handleAutocomplete(
-        interaction: AutocompleteInteraction,
-        filterCallback: (choice: { name: string; value: string }, invoker: GuildMember) => boolean = () => true
-    ): Promise<void> {
-        const voiceChannel = (interaction.member as GuildMember)?.voice?.channel;
-        if (!voiceChannel) {
-            return await interaction.respond([]);
-        }
-
-        const members = Array.from(voiceChannel.members.values()) as GuildMember[];
-        const focused = interaction.options.getFocused().toLowerCase().trim();
-
-        const choices = members
-            .map(member => ({
-                name: member.displayName || member.user.username,
-                value: member.id
-            }))
-            .filter(choice =>
-                choice.name.toLowerCase().includes(focused) && filterCallback(choice, interaction.member as GuildMember));
-
-        await interaction.respond(choices.length > 2 ? choices : []);
+    private static getRandomMember(
+        members: GuildMember[],
+        excludedUsersIds: string[] = []
+    ): GuildMember {
+        const filteredIncludedMembers = members.filter(
+            member => !excludedUsersIds.includes(member.id));
+        const randomIndex = rollDice(filteredIncludedMembers.length) - 1;
+        return filteredIncludedMembers[randomIndex];
     }
 
     /**
@@ -34,7 +26,7 @@ export class RandomMemberSelector {
     static async execute(
         interaction: CommandInteraction,
         filterCallback: (member: GuildMember, invoker: GuildMember) => boolean = () => true
-    ): Promise<void | InteractionResponse<boolean>> {
+    ): Promise<void> {
         if (!interaction.isChatInputCommand())
             return;
 
@@ -43,20 +35,96 @@ export class RandomMemberSelector {
         const voiceChannel = invoker.voice.channel;
 
         if (!voiceChannel) {
-            await interaction.editReply('You must be in a voice channel to use this command!');
+            await interaction.editReply({
+                content: 'You must be in a voice channel to use this command!',
+                components: []
+            });
             return;
         }
-        const excludedUserId = interaction.options.getString('exclude')?.trim();
+        const exclude = interaction.options.getBoolean('exclude') || false;
 
         const includedMembers = Array.from(voiceChannel.members.values())
-            .filter(member => member.id !== excludedUserId && filterCallback(member as GuildMember, invoker)) as GuildMember[];
+            .filter(member => filterCallback(member as GuildMember, invoker)) as GuildMember[];
 
         if (includedMembers.length < 2) {
-            await interaction.editReply('Cannot execute this command - not enough participants!');
+            await interaction.editReply({
+                content: 'Cannot execute this command - not enough participants!',
+                components: []
+            });
             return;
         }
 
-        const randomMember = includedMembers[rollDice(includedMembers.length) - 1];
-        await interaction.editReply(randomMember.displayName || randomMember.user.username);
+        const createEmbed = (member: GuildMember) => {
+            return new EmbedBuilder()
+                .setColor('#5865F2')
+                .addFields(
+                    {
+                        name: member.displayName || member.user.username,
+                        value: `Someone from ${voiceChannel.name}`
+                    }
+                );
+        };
+
+        const createSelectMenuActionRow = () => {
+            const selectMenu = new StringSelectMenuBuilder()
+                .setCustomId(interaction.id)
+                .setPlaceholder('Select a user/s to exclude...')
+                .setMinValues(0)
+                .setMaxValues(includedMembers.length - 2)
+                .addOptions(includedMembers.map((member) =>
+                    new StringSelectMenuOptionBuilder()
+                        .setLabel(member.displayName || member.user.username)
+                        .setValue(member.id)));
+
+            return new ActionRowBuilder<StringSelectMenuBuilder>()
+                .addComponents(selectMenu);
+        };
+
+        if (exclude) {
+            if (includedMembers.length === 2) {
+                await interaction.editReply({
+                    content: 'Cannot exclude someone else - only one person will remain.',
+                    components: []
+                });
+                return;
+            }
+
+            const reply = await interaction.editReply({
+                embeds: [],
+                components: [createSelectMenuActionRow()]
+            });
+
+            const collector = reply.createMessageComponentCollector({
+                componentType: ComponentType.StringSelect,
+                filter: (i) => i.user.id === interaction.user.id && i.customId === interaction.id,
+                time: 60_000, // 1 min
+            });
+
+            collector.on('collect', async (selectInteraction) => {
+                const excludedUsersIds = selectInteraction.values;
+                const randomMember = RandomMemberSelector.getRandomMember(includedMembers, excludedUsersIds);
+
+                await selectInteraction.update({
+                    embeds: [createEmbed(randomMember)],
+                    components: []
+                });
+            });
+
+
+            collector.on('end', async (collected) => {
+                if (collected.size === 0) {
+                    await interaction.editReply({
+                        content: 'You did not select any users in time.',
+                        components: []
+                    });
+                }
+            });
+        } else {
+            const randomMember = RandomMemberSelector.getRandomMember(includedMembers);
+            await interaction.editReply({
+                embeds: [createEmbed(randomMember)],
+                components: []
+            });
+        }
     }
 }
