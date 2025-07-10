@@ -29,7 +29,7 @@ class CurrentNumber {
         }
         this.value += digit;
     }
-    popCurrent(){
+    popCurrent() {
         if (this.value.endsWith('.')) {
             throw new UserError('Number cannot end with decimal point.', this.expr);
         }
@@ -37,7 +37,7 @@ class CurrentNumber {
         this.value = '';
         return result;
     }
-    isEmpty(){
+    isEmpty() {
         return this.value.length === 0;
     }
 }

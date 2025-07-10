@@ -242,12 +242,12 @@ const help: Command = {
             });
         });
 
-        collector.on('end', async (collected) => {
-            if (collected.size === 0) {
+        collector.on('end', async () => {
+            try {
                 await interaction.editReply({
-                    content: 'You did not select any users in time.',
                     components: []
                 });
+            } catch (error) {
             }
         });
     }

@@ -11,10 +11,10 @@ export function createSomeoneCommand(name: string, description: string): SlashCo
                 .setDescription('Provides you selector to exclude specific users from the sample')
         )
         .addNumberOption(option =>
-        option
-            .setName('repeat')
-            .setDescription('Repeats the command the entered number of times')
-            .setMinValue(1)
-            .setMaxValue(config.MAX_SOMEONE_REPETITIONS)
+            option
+                .setName('repeat')
+                .setDescription('Repeats the command the entered number of times')
+                .setMinValue(1)
+                .setMaxValue(config.MAX_SOMEONE_REPETITIONS)
         );
 }
