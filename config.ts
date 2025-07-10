@@ -3,7 +3,7 @@
 export const config = {
     MAX_DICE_COUNT: 5000,
     MAX_DICE_SIDES: 5000,
-    MAX_REPEATINGS: 1000,
+    MAX_ROLL_REPETITIONS: 1000,
     MAX_DISCORD_MESSAGE_LENGTH: 1900, // if you change it, then only less than 2000 (limit for Discord messages)
     MAX_EXPRESSION_LENGTH: 100,
     COIN_EDGE_CHANCE: 100, // actual chance will be 1/COIN_EDGE_CHANCE

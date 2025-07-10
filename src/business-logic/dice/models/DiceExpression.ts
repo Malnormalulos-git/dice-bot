@@ -2,7 +2,7 @@
 import {UserError} from "../../errors/UserError";
 import {ParserResultsFilter} from "./ParserResultsFilter";
 
-const {MAX_REPEATINGS} = config;
+const {MAX_ROLL_REPETITIONS} = config;
 
 export class DiceExpression {
     repeat: number;
@@ -39,7 +39,7 @@ export class DiceExpression {
                 localFilter = ParserResultsFilter.fromExpression(localFilterExpression);
             }
 
-            if (timesToRepeat > 0 && timesToRepeat <= MAX_REPEATINGS) {
+            if (timesToRepeat > 0 && timesToRepeat <= MAX_ROLL_REPETITIONS) {
                 return new DiceExpression({
                     repeat: timesToRepeat,
                     expressionToParser: expressionToParser,
@@ -49,7 +49,7 @@ export class DiceExpression {
             } else if (timesToRepeat <= 0) {
                 throw new UserError(`Cannot repeat ${rawExpression} ${timesToRepeat} times`);
             } else {
-                throw new UserError(`Too much repetition (${timesToRepeat}). Maximum is ${MAX_REPEATINGS}`);
+                throw new UserError(`Too much repetition (${timesToRepeat}). Maximum is ${MAX_ROLL_REPETITIONS}`);
             }
         }
 

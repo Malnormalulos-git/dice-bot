@@ -167,7 +167,7 @@ Customize bot behavior in `config.ts`:
 ### Limits
 - `MAX_DICE_COUNT` - Maximum dice per roll (default: 5000)
 - `MAX_DICE_SIDES` - Maximum sides per die (default: 5000)
-- `MAX_REPEATINGS` - Maximum repetitions (default: 1000)
+- `MAX_ROLL_REPETITIONS` - Maximum repetitions (default: 1000)
 - `MAX_EXPRESSION_LENGTH` - Maximum expression length (default: 100)
 - `MAX_DISCORD_MESSAGE_LENGTH` - Message length before file output (default: 1900)
 

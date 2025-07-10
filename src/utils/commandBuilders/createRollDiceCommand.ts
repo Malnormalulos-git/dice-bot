@@ -1,7 +1,7 @@
 ﻿import {SlashCommandBuilder, SlashCommandOptionsOnlyBuilder} from 'discord.js';
 import {config} from '../../../config';
 
-const {MAX_REPEATINGS} = config;
+const {MAX_ROLL_REPETITIONS} = config;
 
 export function createRollDiceCommand(name: string, description: string): SlashCommandOptionsOnlyBuilder {
     return new SlashCommandBuilder()
@@ -18,7 +18,7 @@ export function createRollDiceCommand(name: string, description: string): SlashC
                 .setName('repeat')
                 .setDescription('Repeats expression roll the entered number of times')
                 .setMinValue(1)
-                .setMaxValue(MAX_REPEATINGS)
+                .setMaxValue(MAX_ROLL_REPETITIONS)
         )
         .addStringOption(option =>
             option

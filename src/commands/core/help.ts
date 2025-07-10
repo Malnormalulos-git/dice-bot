@@ -21,7 +21,7 @@ const {
     ENABLE_PARSING_BY_MESSAGE_WITH_PREFIX,
     MAX_DICE_COUNT,
     MAX_DICE_SIDES,
-    MAX_REPEATINGS,
+    MAX_ROLL_REPETITIONS,
     EMBED_COLOR,
     COIN_EDGE_CHANCE
 } = config;
@@ -124,7 +124,7 @@ const helpPages = [
             '`/roll r3:2d6 repeat:2` - "2d6" repeated 3 times, then whole thing repeated 2 times (total: 6 rolls)\n\n' +
             '**Multiple Expressions with Repetition:**\n' +
             '`r2:3d6;r3:d20` - Roll 3d6 twice, then d20 three times\n\n' +
-            `**Limits:** Maximum ${MAX_REPEATINGS} total repetitions`,
+            `**Limits:** Maximum ${MAX_ROLL_REPETITIONS} total repetitions`,
         value: '5'
     },
     {
@@ -175,7 +175,7 @@ const helpPages = [
             '**System Limits:**\n' +
             `• Maximum dice per roll: ${MAX_DICE_COUNT}\n` +
             `• Maximum sides per die: ${MAX_DICE_SIDES}\n` +
-            `• Maximum repetitions: ${MAX_REPEATINGS}\n` +
+            `• Maximum repetitions: ${MAX_ROLL_REPETITIONS}\n` +
             '• Maximum expression length: 100 characters\n\n' +
             '**Spoiler Example:**\n' +
             '`/roll:d20 hide:true` - Hide result',
