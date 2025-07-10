@@ -22,13 +22,13 @@ describe('DiceExpressionParser', () => {
             const result = parser.parse('2d6');
             expect(result.totalSum).toBe(8); // 4 + 4 from mock
             expect(result.rollOutputs).toHaveLength(1);
-            expect(result.rollOutputs[0].rolls).toEqual([4, 4]);
+            expect(result.rollOutputs[0].rolls.map(r => r.getValue())).toEqual([4, 4]);
         });
 
         test('should parse dice roll without number of dice', () => {
             const result = parser.parse('d20');
             expect(result.totalSum).toBe(4);
-            expect(result.rollOutputs[0].dice).toBe('1d20');
+            expect(result.rollOutputs[0].diceExpression).toBe('1d20');
         });
     });
 
@@ -42,7 +42,7 @@ describe('DiceExpressionParser', () => {
         test('should trunc fractional part of numbers at roll expression', () => {
             const result = parser.parse('2.5d6.7');
             expect(result.totalSum).toBe(8);
-            expect(result.rollOutputs[0].dice).toBe('2d6');
+            expect(result.rollOutputs[0].diceExpression).toBe('2d6');
         });
 
         test('should properly calculate fractional numbers', () => {
@@ -256,7 +256,7 @@ describe('Dice Types', () => {
         test('should sum all dice rolls', () => {
             const result = parser.parse('3d6');
             expect(result.totalSum).toBe(12); // 2 + 4 + 6
-            expect(result.rollOutputs[0].rolls).toEqual([2, 4, 6]);
+            expect(result.rollOutputs[0].rolls.map(r => r.getValue())).toEqual([2, 4, 6]);
         });
     });
 
@@ -264,13 +264,13 @@ describe('Dice Types', () => {
         test('should return highest roll value', () => {
             const result = parser.parse('3h6');
             expect(result.totalSum).toBe(6); // max of [2, 4, 6]
-            expect(result.rollOutputs[0].rolls).toEqual([2, 4, 6]);
+            expect(result.rollOutputs[0].rolls.map(r => r.getValue())).toEqual([2, 4, 6]);
         });
 
         test('should work with single die', () => {
             const result = parser.parse('1h6');
             expect(result.totalSum).toBe(2);
-            expect(result.rollOutputs[0].rolls).toEqual([2]);
+            expect(result.rollOutputs[0].rolls.map(r => r.getValue())).toEqual([2]);
         });
     });
 
@@ -278,13 +278,13 @@ describe('Dice Types', () => {
         test('should return lowest roll value', () => {
             const result = parser.parse('3l6');
             expect(result.totalSum).toBe(2); // min of [4, 6, 2]
-            expect(result.rollOutputs[0].rolls).toEqual([4, 6, 2]);
+            expect(result.rollOutputs[0].rolls.map(r => r.getValue())).toEqual([4, 6, 2]);
         });
 
         test('should work with single die', () => {
             const result = parser.parse('1l6');
             expect(result.totalSum).toBe(4);
-            expect(result.rollOutputs[0].rolls).toEqual([4]);
+            expect(result.rollOutputs[0].rolls.map(r => r.getValue())).toEqual([4]);
         });
     });
 
@@ -292,13 +292,13 @@ describe('Dice Types', () => {
         test('should return average of rolls', () => {
             const result = parser.parse('3a6');
             expect(result.totalSum).toBe(4); // (6 + 2 + 4) / 3
-            expect(result.rollOutputs[0].rolls).toEqual([6, 2, 4]);
+            expect(result.rollOutputs[0].rolls.map(r => r.getValue())).toEqual([6, 2, 4]);
         });
 
         test('should work with single die', () => {
             const result = parser.parse('1a6');
             expect(result.totalSum).toBe(6);
-            expect(result.rollOutputs[0].rolls).toEqual([6]);
+            expect(result.rollOutputs[0].rolls.map(r => r.getValue())).toEqual([6]);
         });
     });
 

@@ -1,10 +1,10 @@
-﻿import {DiceRoll} from "./DiceRoll";
+﻿import {DiceRolls} from "./DiceRolls";
 
 export class ParserResult {
     totalSum: number;
-    rollOutputs: DiceRoll[];
+    rollOutputs: DiceRolls[];
 
-    constructor(totalSum: number = 0, rollOutputs: DiceRoll[] = []) {
+    constructor(totalSum: number = 0, rollOutputs: DiceRolls[] = []) {
         this.totalSum = totalSum;
         this.rollOutputs = rollOutputs;
     }

@@ -5,6 +5,7 @@ const {
     HIGHEST_ROLL_KEYWORD_SYNONYMS,
     LOWEST_ROLL_KEYWORD_SYNONYMS,
     AVERAGE_ROLL_KEYWORD_SYNONYMS,
+    EXPLODE_EXPRESSION_KEYWORD_SYNONYMS,
     REPEAT_EXPRESSION_KEYWORD_SYNONYMS
 } = config;
 
@@ -31,6 +32,11 @@ export function rawExpressionFormatter(rawExpression: string): string {
 
     resultExpression = AVERAGE_ROLL_KEYWORD_SYNONYMS.reduce(
         (str, synonym) => str.replaceAll(synonym, 'a'),
+        resultExpression
+    );
+
+    resultExpression = EXPLODE_EXPRESSION_KEYWORD_SYNONYMS.reduce(
+        (str, synonym) => str.replaceAll(synonym, 'e'),
         resultExpression
     );
 

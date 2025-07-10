@@ -2,12 +2,13 @@
     NUMBER,
     DICE,
     OPERATOR,
-    PARENTHES
+    PARENTHESES
 }
 
 export class Token {
     type: TokenType;
     value: number | string;
+    explode: boolean = false;
 
     constructor(type: TokenType, value: number | string) {
         this.type = type;

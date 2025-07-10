@@ -1,8 +1,9 @@
 import {config} from "../../../../config";
 import {UserError} from "../../errors/UserError";
-import {DiceRoll} from "../models/DiceRoll";
+import {DiceRolls} from "../models/DiceRolls";
 import {ParserResult} from "../models/ParserResult";
 import {Token, TokenType} from "../models/Token";
+import {Roll} from "../models/Roll";
 
 
 const {MAX_DICE_COUNT, MAX_DICE_SIDES, MAX_EXPRESSION_LENGTH} = config;
@@ -10,6 +11,7 @@ const {MAX_DICE_COUNT, MAX_DICE_SIDES, MAX_EXPRESSION_LENGTH} = config;
 const DIGITS = '0123456789.';
 const OPERATORS = '+-*/';
 const DICE_TYPES = 'dhla';
+const EXPLODE = 'e';
 const PARENTHESES = '()';
 
 class CurrentNumber {
@@ -29,6 +31,7 @@ class CurrentNumber {
         }
         this.value += digit;
     }
+
     popCurrent() {
         if (this.value.endsWith('.')) {
             throw new UserError('Number cannot end with decimal point.', this.expr);
@@ -37,6 +40,7 @@ class CurrentNumber {
         this.value = '';
         return result;
     }
+
     isEmpty() {
         return this.value.length === 0;
     }
@@ -44,7 +48,7 @@ class CurrentNumber {
 
 export class DiceExpressionParser {
     diceRoller: (numOfSides: number) => number;
-    diceRolls: DiceRoll[];
+    diceRolls: DiceRolls[];
     originalExpression: string;
 
     constructor(diceRoller: (numOfSides: number) => number) {
@@ -105,8 +109,18 @@ export class DiceExpressionParser {
                 if (!current.isEmpty()) {
                     tokens.push(new Token(TokenType.NUMBER, current.popCurrent()));
                 }
-                tokens.push(new Token(TokenType.PARENTHES, char));
-            } else {
+                tokens.push(new Token(TokenType.PARENTHESES, char));
+            } else if (char === EXPLODE) {
+                if (
+                    !current.isEmpty() ||
+                    tokens.length === 0 ||
+                    tokens[tokens.length - 1].type !== TokenType.DICE
+                ) {
+                    throw new UserError(`Invalid explode operator placement`, expr);
+                }
+                tokens[tokens.length - 1].explode = true;
+            }
+            else {
                 throw new UserError(`Invalid character: "${char}"`, expr);
             }
         }
@@ -149,7 +163,7 @@ export class DiceExpressionParser {
         const result = [...tokens];
 
         for (let i = 0; i < result.length; i++) {
-            if (result[i].type === TokenType.PARENTHES) {
+            if (result[i].type === TokenType.PARENTHESES) {
                 if (result[i].value === '(') {
                     stack.push(i);
                 } else {
@@ -183,11 +197,11 @@ export class DiceExpressionParser {
      */
     handleDiceRolls(tokens: Token[]): Token[] {
         const result = [...tokens];
-        const diceTypes: { [key: string]: (rolls: number[]) => number } = {
-            d: (rolls) => rolls.reduce((sum, roll) => sum + roll, 0),
-            h: (rolls) => Math.max(...rolls),
-            l: (rolls) => Math.min(...rolls),
-            a: (rolls) => rolls.reduce((sum, roll) => sum + roll, 0) / rolls.length
+        const diceTypes: { [key: string]: (rolls: Roll[]) => number } = {
+            d: (rolls) => rolls.reduce((sum, roll) => sum + roll.getValue(), 0),
+            h: (rolls) => Math.max(...rolls.map((roll) => roll.getValue())),
+            l: (rolls) => Math.min(...rolls.map((roll) => roll.getValue())),
+            a: (rolls) => rolls.reduce((sum, roll) => sum + roll.getValue(), 0) / rolls.length
         };
 
         for (let i = 0; i < result.length; i++) {
@@ -199,28 +213,39 @@ export class DiceExpressionParser {
             ) {
                 const numOfDice = Math.trunc(result[i].value as number);
                 const dice = result[i + 1].value as string;
+                const explode = result[i + 1].explode;
                 const numOfSides = Math.trunc(result[i + 2].value as number);
 
+                const diceExpression = `${numOfDice}${dice}${explode ? 'e' : ''}${numOfSides}`;
+
                 if (numOfDice < 0 || numOfSides < 1) {
-                    throw new UserError(`Invalid number of dice or sides: "${numOfDice + dice + numOfSides}"`,
+                    throw new UserError(`Invalid number of dice or sides: "${diceExpression}"`,
                         this.originalExpression);
                 }
                 if (numOfDice > MAX_DICE_COUNT || numOfSides > MAX_DICE_SIDES) {
                     throw new UserError(
-                        `Too big number of dice or sides: "${numOfDice + dice + numOfSides}". 
-                        Maximum is ${MAX_DICE_COUNT}d${MAX_DICE_SIDES}`,
+                        `Too big number of dice or sides: "${diceExpression}". Maximum is ${MAX_DICE_COUNT}d${MAX_DICE_SIDES}`,
                         this.originalExpression
                     );
                 }
 
-                const rolls: number[] = [];
+                const self = this;
+
+                function rollDice(): Roll {
+                    const result = self.diceRoller(numOfSides);
+                    if (explode && result === numOfSides && numOfSides !== 1) {
+                        return new Roll(result, rollDice());
+                    }
+                    return new Roll(result, null);
+                }
+
+                const rolls: Roll[] = [];
                 for (let j = 0; j < numOfDice; j++) {
-                    const roll = this.diceRoller(numOfSides);
-                    rolls.push(roll);
+                    rolls.push(rollDice());
                 }
 
                 const diceResult = diceTypes[dice](rolls);
-                const diceRoll = new DiceRoll(`${numOfDice + dice + numOfSides}`, rolls, diceResult);
+                const diceRoll = new DiceRolls(diceExpression, rolls, diceResult);
                 this.diceRolls.push(diceRoll);
                 result.splice(i, 3, new Token(TokenType.NUMBER, diceRoll.diceResult));
             }
