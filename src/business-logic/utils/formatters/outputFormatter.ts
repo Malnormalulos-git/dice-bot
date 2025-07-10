@@ -3,6 +3,7 @@ import {config} from "../../../../config";
 import {DiceExpression} from "../../dice/models/DiceExpression";
 import {ParserResult} from "../../dice/models/ParserResult";
 import {FilterType, ParserResultsFilter} from "../../dice/models/ParserResultsFilter";
+import toFixedWithRounding from "../toFixedWithRounding";
 
 const {MAX_DISCORD_MESSAGE_LENGTH} = config;
 
@@ -12,10 +13,7 @@ function wrapInMarkdown(output: string, isCoveredBySpoiler: boolean): string {
     return `\`\`\`Markdown\n${output.trim()}\`\`\``;
 }
 
-function toFixed(value: number, precision: number = 0) {
-    const power = Math.pow(10, precision);
-    return String(Math.round(value * power) / power);
-}
+
 
 /**
  * Formats the output of processed dice roll expressions
@@ -55,13 +53,13 @@ export function outputFormatter(
                 if (asArray.length > 0)
                     finalResults
                         .push((asArray)
-                            .map(v => toFixed(v, 3))
+                            .map(v => toFixedWithRounding(v, 3))
                             .join('; '));
             } else {
-                finalResults.push(toFixed(filteredResult as number, 3));
+                finalResults.push(toFixedWithRounding(filteredResult as number, 3).toString());
             }
         } else if (totalSums.length > 0) {
-            finalResults.push(totalSums.map(sum => toFixed(sum, 3)).join('; '));
+            finalResults.push(totalSums.map(sum => toFixedWithRounding(sum, 3)).join('; '));
         }
 
         errors.forEach(error => {

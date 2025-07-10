@@ -7,6 +7,7 @@ export const config = {
     MAX_DISCORD_MESSAGE_LENGTH: 1900, // if you change it, then only less than 2000 (limit for Discord messages)
     MAX_EXPRESSION_LENGTH: 100,
     COIN_EDGE_CHANCE: 100, // actual chance will be 1/COIN_EDGE_CHANCE
+    MAX_SOMEONE_REPETITIONS: 100,
     ROLL_KEYWORD_SYNONYMS: ['dice', 'д', 'в', 'к'],                 // will be replaced by 'd'
     HIGHEST_ROLL_KEYWORD_SYNONYMS: ['high', 'highest', 'best', 'b'],// will be replaced by 'h'
     LOWEST_ROLL_KEYWORD_SYNONYMS: ['low', 'lowest', 'worst', 'w'],  // will be replaced by 'l'
