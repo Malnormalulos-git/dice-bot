@@ -7,9 +7,9 @@
     StringSelectMenuBuilder,
     StringSelectMenuOptionBuilder
 } from 'discord.js';
-import {rollDice} from '../dice/services/diceRoller';
 import {config} from "../../../config";
 import toFixedWithRounding from "../utils/toFixedWithRounding";
+import {randomNumber} from "../utils/randomNumber";
 
 export class RandomMemberSelector {
     /**
@@ -21,7 +21,7 @@ export class RandomMemberSelector {
     ): GuildMember {
         const filteredIncludedMembers = members.filter(
             member => !excludedUsersIds.includes(member.id));
-        const randomIndex = rollDice(filteredIncludedMembers.length) - 1;
+        const randomIndex = randomNumber(filteredIncludedMembers.length) - 1;
         return filteredIncludedMembers[randomIndex];
     }
 

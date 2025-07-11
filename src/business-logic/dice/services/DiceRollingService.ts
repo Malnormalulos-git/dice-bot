@@ -2,9 +2,9 @@ import {DiceExpressionParser} from "../parser/DiceExpressionParser";
 import {DiceExpression} from '../models/DiceExpression';
 import {ParserResult} from "../models/ParserResult";
 import {rawExpressionFormatter} from "../../utils/formatters/rawExpressionFormatter";
-import {rollDice} from "./diceRoller";
 import {UserError} from "../../errors/UserError";
 import {ParserResultsFilter} from "../models/ParserResultsFilter";
+import {randomNumber} from "../../utils/randomNumber";
 
 /**
  * Processes a die roll expression/s and returns formatted output
@@ -18,7 +18,7 @@ export function processRoll(
     results: (ParserResult | { error: string })[];
 }> {
     const rawExpressions = rawExpressionFormatter(input).split(';');
-    const parser = new DiceExpressionParser(rollDice);
+    const parser = new DiceExpressionParser(randomNumber);
 
     const processedExpressions: Array<{
         expression: DiceExpression;

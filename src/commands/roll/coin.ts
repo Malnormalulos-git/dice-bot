@@ -1,23 +1,17 @@
 ﻿import {SlashCommandBuilder, CommandInteraction} from 'discord.js';
 import {Command} from '../../types/types';
-import {rollDice} from '../../business-logic/dice/services/diceRoller';
-import path from 'node:path';
-import {fileURLToPath} from "node:url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import CoinTosser from "../../business-logic/coin/CoinTosser";
 
 const coin: Command = {
     data: new SlashCommandBuilder()
         .setName('coin')
         .setDescription('Toss a coin!'),
     async execute(interaction: CommandInteraction) {
-        const result = rollDice(2);
-        const filePath = path.join(__dirname, '..', '..', '..', 'assets', 'roll', 'coin',
-            result === 1 ? 'heads.gif' : 'tails.gif');
+        const result = CoinTosser.toss();
+
         await interaction.editReply({
-            content: `||\`${result === 1 ? 'Heads' : 'Tails'}\`||`,
-            files: [filePath]
+            content: result.result,
+            files: [result.filePath]
         });
     }
 };
