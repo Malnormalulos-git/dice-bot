@@ -1,7 +1,9 @@
 # Dice-bot for Discord
+
 ## Features
 
 ### Dice Rolling
+
 1. **Multiple dice rolling types:**
     - Regular rolls (sum of all dice)
     - Highest roll (takes the highest result)
@@ -12,24 +14,28 @@
     - Support for multiple expressions in one command
     - Repetition system (global and local)
     - Advanced filtering system
+    - Exploding dice system
     - Grouping with parentheses
     - Mathematical operations (+, -, *, /)
     - Detailed roll results
     - Support for large outputs via file attachments
 
 ### Coin Flipping
+
 - Regular coin toss (heads/tails)
 - Coin with edge (adjustable chance of landing on edge)
 - Animated GIF results with spoiler tags
 
 ### Random Member Selection
+
 - Choose random member from voice channel
 - Option to exclude yourself from selection
-- Perfect for deciding turn order or task assignment
+- Selector to exclude other users from selection
 
 ## Commands
 
 ### Basic Commands
+
 - `/roll 'expression'` - main dice rolling command
 - `/r 'expression'` - shortened version of /roll
 - `/coin` - flip a regular coin
@@ -39,32 +45,56 @@
 - `/help` - shows comprehensive help information
 
 ### Message Prefix (Optional)
-You can also roll by message with prefix: `!expression`
+
+You can also use commands by message with prefix: `!command`
 *(requires configuration - see Configuration section)*
+
+**Available prefix commands:**
+
+- `!help` - show help information
+- `!someone` - pick random person from voice channel (params - `repeat`(number) and `exclude`(boolean))
+- `!someone-except-me` - pick random person excluding yourself (params - same as `someone`)
+- `!coin` - flip a regular coin
+- `!coin-with-edge` - flip coin with rare edge possibility
+- `!any` - default, tries to parse roll expression to roll dice (same as /roll)
 
 ## Expression Examples
 
 **Priority order:** `()` → `XdY`, `XhY`, `XlY`, `XaY` → `*`, `/` → `+`, `-`
 
 ### Basic Rolls
+
 ```
 /roll 2d6     # Roll two six-sided dice
 /roll d20     # Roll one twenty-sided die
 ```
 
 ### Roll Types
+
 ```
 /roll 2h6     # Roll two d6 and take highest
 /roll 3l6     # Roll three d6 and take lowest
 /roll 4a8     # Roll four d8 and take average
 ```
 
+### Exploding Dice
+
+```
+/roll 2d6e    # Roll 2d6 with exploding dice
+/roll 3d10explode  # Alternative syntax for exploding dice
+```
+
+**Exploding dice logic:** When a die rolls its maximum value (e.g., 6 on d6), an additional die of the same type is
+automatically rolled. This process continues until a result less than the maximum is rolled.
+
 ### Multiple Expressions
+
 ```
 /roll 2d6;d20;3d4  # Roll multiple dice sets separately
 ```
 
 ### Math Operations
+
 ```
 /roll 2d20+5          # Roll 2d20 and add 5
 /roll (2d4)*2         # Roll 2d4 and multiply by 2
@@ -72,6 +102,7 @@ You can also roll by message with prefix: `!expression`
 ```
 
 ### Repetition System
+
 ```
 # Global repetition (via command option)
 /roll 2d6 repeat:3    # Repeat entire expression 3 times
@@ -85,6 +116,7 @@ You can also roll by message with prefix: `!expression`
 ```
 
 ### Filtering System
+
 ```
 # Basic filters
 /roll r10:d20[>15]     # Show only rolls greater than 15
@@ -96,6 +128,7 @@ You can also roll by message with prefix: `!expression`
 ```
 
 ### Spoiler Tags
+
 ```
 /roll d20 cover-up-with-spoiler:true  # Hide results with spoiler tags
 ```
@@ -103,19 +136,24 @@ You can also roll by message with prefix: `!expression`
 ## Advanced Features
 
 ### Synonyms Support
+
 The bot supports multiple language synonyms:
+
 - **Regular rolls:** `d`, `dice`, `д`, `в`, `к`
 - **Highest rolls:** `h`, `high`, `highest`, `best`, `b`
 - **Lowest rolls:** `l`, `low`, `lowest`, `worst`, `w`
-- **Average rolls:** `a`, `average`
+- **Average rolls:** `a`, `average`, `а`
+- **Exploding dice:** `e`, `explode`, `е`
 - **Repetition:** `r`, `repeat`, `п`
 
 ### Filter Syntax
+
 **Format:** `[comparator][value][type]`
 
 **Comparators:** `>`, `>=`, `<`, `<=`, `=`
 
 **Filter Types:**
+
 - *(none)* - Display matching results
 - `s` - Sum of matching results
 - `c` - Count of matching results
@@ -123,10 +161,12 @@ The bot supports multiple language synonyms:
 ## Installation
 
 ### Prerequisites
+
 - [Node.js](https://nodejs.org/en) (check with `node -v`)
 - Discord bot token and client ID
 
 ### Setup Steps
+
 1. **Clone the repository:**
    ```bash
    git clone https://github.com/Malnormalulos-git/dice-bot.git
@@ -165,6 +205,7 @@ The bot supports multiple language synonyms:
 Customize bot behavior in `config.ts`:
 
 ### Limits
+
 - `MAX_DICE_COUNT` - Maximum dice per roll (default: 5000)
 - `MAX_DICE_SIDES` - Maximum sides per die (default: 5000)
 - `MAX_ROLL_REPETITIONS` - Maximum repetitions for rolls (default: 1000)
@@ -173,22 +214,28 @@ Customize bot behavior in `config.ts`:
 - `MAX_SOMEONE_REPETITIONS` - Maximum repetitions for someone commands (default: 100)
 
 ### Probability adjustments
+
 - `COIN_EDGE_CHANCE` - chance of coin edge will be 1/`COIN_EDGE_CHANCE` (default: 100)
 
 ### Language Synonyms
+
 - `ROLL_KEYWORD_SYNONYMS` - Alternatives for 'd' (default: `['dice', 'д', 'в', 'к']`)
 - `HIGHEST_ROLL_KEYWORD_SYNONYMS` - Alternatives for 'h' (default: `['high', 'highest', 'best', 'b']`)
 - `LOWEST_ROLL_KEYWORD_SYNONYMS` - Alternatives for 'l' (default: `['low', 'lowest', 'worst', 'w']`)
-- `AVERAGE_ROLL_KEYWORD_SYNONYMS` - Alternatives for 'a' (default: `['average', 'a']`)
+- `AVERAGE_ROLL_KEYWORD_SYNONYMS` - Alternatives for 'a' (default: `['average', 'а']`)
+- `EXPLODE_EXPRESSION_KEYWORD_SYNONYMS` - Alternatives for 'e' (default: `['explode', 'е']`)
 - `REPEAT_EXPRESSION_KEYWORD_SYNONYMS` - Alternatives for 'r' (default: `['repeat', 'п']`)
 
 ### Message Parsing
+
 - `ENABLE_PARSING_BY_MESSAGE_WITH_PREFIX` - Enable message prefix parsing (default: true)
 - `PARSE_BY_MESSAGE_PREFIX` - Message prefix character (default: '!')
 
-**Note:** For message parsing, enable 'Message Content Intent' at [Discord Developer Portal](https://discord.com/developers/applications) → "Bot"
+**Note:** For message parsing, enable 'Message Content Intent'
+at [Discord Developer Portal](https://discord.com/developers/applications) → "Bot"
 
 ### Bot Appearance
+
 - `BOT_STATUS` - Bot's presence status
 - `BOT_ACTIVITY` - Bot's activity and signature
 - `EMBED_COLOR` - Bot's embeds color
@@ -196,17 +243,21 @@ Customize bot behavior in `config.ts`:
 ## Examples & Use Cases
 
 ### Tabletop Gaming
+
 ```
 /roll d20+5;2d6+3     # Attack roll + damage
 /roll 2h20            # Roll with advantage  
 /roll 2l20            # Roll with disadvantage
 
 /roll r6:d6[>=5c]     # Count successes (5+)
-
 /roll r8:d10[>=8c]    # Count successes (8+)
+
+/roll 2d6e+3          # Exploding dice roll
+/roll 4d6e[>=5c]      # Exploding dice with success counting
 ```
 
 ### Group Activities
+
 ```
 /someone              # Pick random player for turn
 /someone-except-me    # Pick someone else to go first
@@ -215,8 +266,10 @@ Customize bot behavior in `config.ts`:
 ```
 
 ### Complex Expressions
+
 ```
 /roll ((2d4+1)*3)+2d6           # Nested calculations
 /roll r3:2d6;r2:d20+3;4d4       # Multiple different roll sets
 /roll r20:d20[>=15c] repeat:3   # Statistical analysis
+/roll 3d10e+2d6e                # Multiple exploding dice types
 ```
