@@ -80,8 +80,8 @@ You can also use commands by message with prefix: `!command`
 ### Exploding Dice
 
 ```
-/roll 2d6e    # Roll 2d6 with exploding dice
-/roll 3d10explode  # Alternative syntax for exploding dice
+/roll 2de6    # Roll 2d6 with exploding dice
+/roll 3dexplode10  # Alternative syntax for exploding dice
 ```
 
 **Exploding dice logic:** When a die rolls its maximum value (e.g., 6 on d6), an additional die of the same type is
@@ -252,8 +252,8 @@ at [Discord Developer Portal](https://discord.com/developers/applications) → "
 /roll r6:d6[>=5c]     # Count successes (5+)
 /roll r8:d10[>=8c]    # Count successes (8+)
 
-/roll 2d6e+3          # Exploding dice roll
-/roll 4d6e[>=5c]      # Exploding dice with success counting
+/roll 2de6+3          # Exploding dice roll
+/roll 4de6[>=5c]      # Exploding dice with success counting
 ```
 
 ### Group Activities
@@ -271,5 +271,5 @@ at [Discord Developer Portal](https://discord.com/developers/applications) → "
 /roll ((2d4+1)*3)+2d6           # Nested calculations
 /roll r3:2d6;r2:d20+3;4d4       # Multiple different roll sets
 /roll r20:d20[>=15c] repeat:3   # Statistical analysis
-/roll 3d10e+2d6e                # Multiple exploding dice types
+/roll 3de10+2de6                # Multiple exploding dice types
 ```
