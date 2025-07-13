@@ -228,7 +228,7 @@ Customize bot behavior in `config.ts`:
 
 ### Message Parsing
 
-- `ENABLE_PARSING_BY_MESSAGE_WITH_PREFIX` - Enable message prefix parsing (default: true)
+- `ENABLE_PARSING_BY_MESSAGE_WITH_PREFIX` - Enable message prefix parsing (default: false)
 - `PARSE_BY_MESSAGE_PREFIX` - Message prefix character (default: '!')
 
 **Note:** For message parsing, enable 'Message Content Intent'

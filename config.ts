@@ -14,7 +14,7 @@ export const config = {
     AVERAGE_ROLL_KEYWORD_SYNONYMS: ['average', 'а'],                // will be replaced by 'a'
     EXPLODE_EXPRESSION_KEYWORD_SYNONYMS: ['explode', 'е'],          // will be replaced by 'e'
     REPEAT_EXPRESSION_KEYWORD_SYNONYMS: ['repeat', 'п'],            // will be replaced by 'r'
-    ENABLE_PARSING_BY_MESSAGE_WITH_PREFIX: true,
+    ENABLE_PARSING_BY_MESSAGE_WITH_PREFIX: false,
     PARSE_BY_MESSAGE_PREFIX: '!',
     BOT_STATUS: PresenceUpdateStatus.DoNotDisturb,
     BOT_ACTIVITY: {
