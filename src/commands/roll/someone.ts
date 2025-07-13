@@ -6,7 +6,7 @@ import {createSomeoneCommand} from "../../utils/commandBuilders/createSomeoneCom
 const someone: Command = {
     data: createSomeoneCommand('someone', 'Chooses one random participant from voice channel'),
     async execute(interaction: CommandInteraction) {
-        await RandomMemberSelector.execute(interaction);
+        await RandomMemberSelector.executeFromInteraction(interaction);
     }
 };
 

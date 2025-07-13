@@ -6,7 +6,7 @@ import {createSomeoneCommand} from "../../utils/commandBuilders/createSomeoneCom
 const someoneExceptMe: Command = {
     data: createSomeoneCommand('someone-except-me', 'Chooses one random participant from voice channel except you'),
     async execute(interaction: CommandInteraction) {
-        await RandomMemberSelector.execute(
+        await RandomMemberSelector.executeFromInteraction(
             interaction,
             (member, invoker) => member.id !== invoker.id);
     }

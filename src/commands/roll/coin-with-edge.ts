@@ -8,12 +8,7 @@ const coinWithEdge: Command = {
         .setName('coin-with-edge')
         .setDescription(`Toss a coin! (1/${config.COIN_EDGE_CHANCE} chance of edge)`),
     async execute(interaction: CommandInteraction) {
-        const result = CoinTosser.toss(true);
-
-        await interaction.editReply({
-            content: result.result,
-            files: [result.filePath]
-        });
+        await CoinTosser.executeFromInteraction(interaction, true);
     }
 };
 

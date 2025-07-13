@@ -3,13 +3,18 @@
     CommandInteraction,
     ComponentType,
     EmbedBuilder,
-    GuildMember,
+    GuildMember, Message,
     StringSelectMenuBuilder,
     StringSelectMenuOptionBuilder
 } from 'discord.js';
 import {config} from "../../../config";
 import toFixedWithRounding from "../utils/toFixedWithRounding";
-import {randomNumber} from "../utils/randomNumber";
+import {randomNumber} from "../random/randomNumber";
+import MessageAdapter from "../adapters/MessageAdapter";
+import InteractionAdapter from "../adapters/InteractionAdapter";
+import CommandAdapter from "../adapters/CommandAdapter";
+import someone from "../../commands/roll/someone";
+import parseOptions from "../utils/parseOptions";
 
 export class RandomMemberSelector {
     /**
@@ -93,44 +98,65 @@ export class RandomMemberSelector {
     }
 
     /**
-     * Executes the random member selection
+     * Core logic - works with any adapter
      */
-    static async execute(
-        interaction: CommandInteraction,
-        filterCallback: (member: GuildMember, invoker: GuildMember) => boolean = () => true
+    private static async executeWithAdapter(
+        adapter: CommandAdapter,
+        options: {
+            exclude?: boolean;
+            repeat?: number;
+            filterCallback?: (member: GuildMember, invoker: GuildMember) => boolean;
+        } = {}
     ): Promise<void> {
-        if (!interaction.isChatInputCommand())
-            return;
+        const {exclude = false, repeat = 1, filterCallback = () => true} = options;
 
-        const invoker = interaction.member as GuildMember;
+        const invoker = adapter.member;
         const voiceChannel = invoker.voice.channel;
 
         if (!voiceChannel) {
-            await interaction.editReply({
+            await adapter.editReply({
                 content: 'You must be in a voice channel to use this command!',
                 components: []
             });
             return;
         }
 
-        const exclude = interaction.options.getBoolean('exclude') || false;
-        const repeatCount = interaction.options.getNumber('repeat') || 1;
-
         const includedMembers = Array.from(voiceChannel.members.values())
             .filter(member => !member.user.bot &&
                 filterCallback(member as GuildMember, invoker)) as GuildMember[];
 
         if (includedMembers.length < 2) {
-            await interaction.editReply({
+            await adapter.editReply({
                 content: 'Cannot execute this command - not enough participants!',
                 components: []
             });
             return;
         }
 
-        const createSelectMenuActionRow = () => {
+        const processResults = async (excludedUsersIds: string[] = []) => {
+            const results: GuildMember[] = [];
+
+            for (let i = 0; i < repeat; i++) {
+                const randomMember = RandomMemberSelector.getRandomMember(includedMembers, excludedUsersIds);
+                results.push(randomMember);
+            }
+
+            return repeat === 1
+                ? RandomMemberSelector.createSingleResultEmbed(results[0], voiceChannel.name)
+                : RandomMemberSelector.createMultipleResultsEmbed(results, voiceChannel.name, repeat);
+        };
+
+        if (exclude) {
+            if (includedMembers.length === 2) {
+                await adapter.editReply({
+                    content: 'Cannot exclude someone else - only one person will remain.',
+                    components: []
+                });
+                return;
+            }
+
             const selectMenu = new StringSelectMenuBuilder()
-                .setCustomId(interaction.id)
+                .setCustomId(adapter.getCommandId())
                 .setPlaceholder('Select a user/s to exclude...')
                 .setMinValues(0)
                 .setMaxValues(includedMembers.length - 2)
@@ -139,44 +165,21 @@ export class RandomMemberSelector {
                         .setLabel(member.displayName || member.user.username)
                         .setValue(member.id)));
 
-            return new ActionRowBuilder<StringSelectMenuBuilder>()
+            const actionRow = new ActionRowBuilder<StringSelectMenuBuilder>()
                 .addComponents(selectMenu);
-        };
 
-        const processResults = async (excludedUsersIds: string[] = []) => {
-            const results: GuildMember[] = [];
-
-            for (let i = 0; i < repeatCount; i++) {
-                const randomMember = RandomMemberSelector.getRandomMember(includedMembers, excludedUsersIds);
-                results.push(randomMember);
-            }
-
-            return repeatCount === 1
-                ? RandomMemberSelector.createSingleResultEmbed(results[0], voiceChannel.name)
-                : RandomMemberSelector.createMultipleResultsEmbed(results, voiceChannel.name, repeatCount);
-        };
-
-        if (exclude) {
-            if (includedMembers.length === 2) {
-                await interaction.editReply({
-                    content: 'Cannot exclude someone else - only one person will remain.',
-                    components: []
-                });
-                return;
-            }
-
-            const reply = await interaction.editReply({
+            await adapter.editReply({
                 embeds: [],
-                components: [createSelectMenuActionRow()]
+                components: [actionRow]
             });
 
-            const collector = reply.createMessageComponentCollector({
+            const collector = await adapter.createCollector({
                 componentType: ComponentType.StringSelect,
-                filter: (i) => i.user.id === interaction.user.id && i.customId === interaction.id,
+                filter: (i: any) => i.user.id === adapter.getUserId() && i.customId === adapter.getCommandId(),
                 time: 60_000, // 1 min
             });
 
-            collector.on('collect', async (selectInteraction) => {
+            collector.on('collect', async (selectInteraction: any) => {
                 const excludedUsersIds = selectInteraction.values;
                 const embed = await processResults(excludedUsersIds);
 
@@ -186,9 +189,9 @@ export class RandomMemberSelector {
                 });
             });
 
-            collector.on('end', async (collected) => {
+            collector.on('end', async (collected: any) => {
                 if (collected.size === 0) {
-                    await interaction.editReply({
+                    await adapter.editReply({
                         content: 'You did not select any users in time.',
                         components: []
                     });
@@ -196,10 +199,45 @@ export class RandomMemberSelector {
             });
         } else {
             const embed = await processResults();
-            await interaction.editReply({
+            await adapter.editReply({
                 embeds: [embed],
                 components: []
             });
         }
+    }
+
+    /**
+     * Execute from SlashCommand
+     */
+    static async executeFromInteraction(
+        interaction: CommandInteraction,
+        filterCallback: (member: GuildMember, invoker: GuildMember) => boolean = () => true
+    ): Promise<void> {
+        if (!interaction.isChatInputCommand()) return;
+
+        const adapter = new InteractionAdapter(interaction);
+        const exclude = interaction.options.getBoolean('exclude') || false;
+        const repeat = interaction.options.getNumber('repeat') || 1;
+
+        await this.executeWithAdapter(adapter, {exclude, repeat, filterCallback});
+    }
+
+    /**
+     * Execute from Message
+     */
+    static async executeFromMessage(
+        message: Message,
+        input: string,
+        filterCallback: (member: GuildMember, invoker: GuildMember) => boolean = () => true
+    ): Promise<void> {
+        const adapter = new MessageAdapter(message);
+
+        const commandOptions = someone.data.options;
+        const parsedOptions = parseOptions(input, commandOptions);
+
+        const exclude = parsedOptions.exclude as boolean || false;
+        const repeat = parsedOptions.repeat as number || 1;
+
+        await this.executeWithAdapter(adapter, {exclude, repeat, filterCallback});
     }
 }
