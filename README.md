@@ -200,6 +200,25 @@ The bot supports multiple language synonyms:
    npm run dev
    ```
 
+## Docker
+
+1. **Ensure you set up `.env` file.**
+
+2. **Then run**:
+   ```bash
+   npm run build
+   ```
+
+3. **After that**:
+   ```bash
+   docker build -t dice-bot .
+   ```
+
+4. **And finally**:
+   ```bash
+   docker run dice-bot
+   ```
+
 ## Configuration
 
 Customize bot behavior in `config.ts`:
