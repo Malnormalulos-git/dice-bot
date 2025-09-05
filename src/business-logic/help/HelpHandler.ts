@@ -40,13 +40,15 @@ const helpPages = [
             '`/roll XhY` - Roll X dice, take highest result\n' +
             '`/roll XlY` - Roll X dice, take lowest result\n' +
             '`/roll XaY` - Roll X dice, take average result\n' +
-            '`/r XdY` - Shorter version of /roll\n\n' +
+            '`/r XdY` - Shorter version of /roll\n' +
+            '`/unique count:X sides:Y` - Generate X unique values from 1 to Y\n\n' +
             (ENABLE_PARSING_BY_MESSAGE_WITH_PREFIX
                 ? `**Message Prefix:**\n` +
                 `\`${PARSE_BY_MESSAGE_PREFIX}XdY\` - Roll dice using message prefix\n` +
                 `\`${PARSE_BY_MESSAGE_PREFIX}XhY\` - Roll dice, take highest result\n` +
                 `\`${PARSE_BY_MESSAGE_PREFIX}XlY\` - Roll dice, take lowest result\n` +
-                `\`${PARSE_BY_MESSAGE_PREFIX}XaY\` - Roll dice, take average result\n\n`
+                `\`${PARSE_BY_MESSAGE_PREFIX}XaY\` - Roll dice, take average result\n` +
+                `\`${PARSE_BY_MESSAGE_PREFIX}unique count:X sides:Y\` - Generate unique values with prefix\n\n`
                 : '') +
             '**Multiple Expressions:**\n' +
             'Use `;` to separate multiple rolls:\n' +
@@ -54,8 +56,40 @@ const helpPages = [
             '**Basic Examples:**\n' +
             '• `/roll 2d6` - Roll two six-sided dice\n' +
             '• `/roll d20+5` - Roll d20 and add 5\n' +
-            '• `/roll 3h6` - Roll 3d6, take highest',
+            '• `/roll 3h6` - Roll 3d6, take highest\n' +
+            '• `/unique count:5 sides:10` - Generate 5 unique values from 1-10',
         value: '0'
+    },
+    {
+        title: '🎲 Unique Values System',
+        content: '**Unique Values Command:**\n' +
+            '`/unique count:X sides:Y` - Generate X unique random values from 1 to Y\n\n' +
+            (ENABLE_PARSING_BY_MESSAGE_WITH_PREFIX
+                ? `**Message Prefix:**\n` +
+                `\`${PARSE_BY_MESSAGE_PREFIX}unique count:X sides:Y\` - Generate unique values with prefix\n\n`
+                : '') +
+            '**How it works:**\n' +
+            '• Generates specified count of unique random numbers\n' +
+            '• No duplicate values in a single command\n' +
+            '• Values range from 1 to specified maximum\n' +
+            '• Perfect for selecting unique items, positions, or participants\n\n' +
+            '**Validation:**\n' +
+            '• Count cannot exceed the number of sides\n' +
+            '• Both count and sides must be greater than 0\n' +
+            `• Maximum limits: ${MAX_DICE_COUNT} count, ${MAX_DICE_SIDES} sides\n\n` +
+            '**Examples:**\n' +
+            '• `/unique count:3 sides:6` - Pick 3 unique numbers from 1-6\n' +
+            '• `/unique count:5 sides:20` - Pick 5 unique numbers from 1-20\n' +
+            '• `/unique count:10 sides:100` - Pick 10 unique numbers from 1-100\n' +
+            (ENABLE_PARSING_BY_MESSAGE_WITH_PREFIX
+                ? `• \`${PARSE_BY_MESSAGE_PREFIX}unique count:7 sides:12\` - Pick 7 unique from 1-12 with prefix\n`
+                : '') +
+            '\n**Use Cases:**\n' +
+            '• Random seating arrangements\n' +
+            '• Unique loot distribution\n' +
+            '• Non-repeating random selections\n' +
+            '• Tournament bracket positioning',
+        value: '1'
     },
     {
         title: '🟡 Coin Commands',
@@ -76,7 +110,7 @@ const helpPages = [
             '• Use `/coin` for quick decisions\n' +
             '• Use `/coin-with-edge` for dramatic effect\n' +
             '• Perfect for settling disputes or making choices',
-        value: '1'
+        value: '2'
     },
     {
         title: '👥 Random Member Selection',
@@ -103,7 +137,7 @@ const helpPages = [
                 ? `• \`${PARSE_BY_MESSAGE_PREFIX}someone repeat:5\` - Pick 5 times using prefix\n` +
                 `• \`${PARSE_BY_MESSAGE_PREFIX}someone-except-me exclude:true\` - Interactive exclusion with prefix\n`
                 : ''),
-        value: '2'
+        value: '3'
     },
     {
         title: '🎯 Roll Types & Synonyms',
@@ -119,7 +153,7 @@ const helpPages = [
             '**Average Roll (a) - Take average result**\n' +
             `Synonyms: ${formatSynonyms(AVERAGE_ROLL_KEYWORD_SYNONYMS)}\n` +
             'Example: `4a8` or `4average8`',
-        value: '3'
+        value: '4'
     },
     {
         title: '💥 Exploding Dice System',
@@ -138,7 +172,7 @@ const helpPages = [
             (ENABLE_PARSING_BY_MESSAGE_WITH_PREFIX
                 ? `• \`${PARSE_BY_MESSAGE_PREFIX}2de6\` - Two exploding d6 dice with prefix\n`
                 : ''),
-        value: '4'
+        value: '5'
     },
     {
         title: '⚙️ Math Operations & Grouping',
@@ -160,7 +194,7 @@ const helpPages = [
             (ENABLE_PARSING_BY_MESSAGE_WITH_PREFIX
                 ? `• \`${PARSE_BY_MESSAGE_PREFIX}(2d6+1)*3\` - Complex math with prefix\n`
                 : ''),
-        value: '5'
+        value: '6'
     },
     {
         title: '🔁 Repetition System',
@@ -180,7 +214,7 @@ const helpPages = [
                 `\`${PARSE_BY_MESSAGE_PREFIX}r2:3de6;r3:d20\` - Multiple expressions with repetition\n\n`
                 : '') +
             `**Limits:** Maximum ${MAX_ROLL_REPETITIONS} total repetitions`,
-        value: '6'
+        value: '7'
     },
     {
         title: '🎯 Advanced Filtering System',
@@ -206,7 +240,7 @@ const helpPages = [
             (ENABLE_PARSING_BY_MESSAGE_WITH_PREFIX
                 ? `• \`${PARSE_BY_MESSAGE_PREFIX}r10:d20[>15]\` - Filter with prefix\n`
                 : ''),
-        value: '7'
+        value: '8'
     },
     {
         title: '💡 Practical Examples',
@@ -220,17 +254,19 @@ const helpPages = [
             '`3d6+2d4+5` - Multiple dice types + modifier\n\n' +
             '**Group Management:**\n' +
             '`/someone repeat:4` - Initiative order with stats\n' +
-            '`/someone-except-me exclude:true` - Pick player, exclude specific people\n\n' +
+            '`/someone-except-me exclude:true` - Pick player, exclude specific people\n' +
+            '`/unique count:4 sides:20` - Assign unique initiative positions\n\n' +
             '**Quick Decisions:**\n' +
             '`/coin-with-edge` - Dramatic story moments\n' +
-            '`r5:d100[<20c]` - Probability testing\n\n' +
+            '`r5:d100[<20c]` - Probability testing\n' +
+            '`/unique count:3 sides:10` - Pick 3 unique treasure items\n\n' +
             (ENABLE_PARSING_BY_MESSAGE_WITH_PREFIX
                 ? `**With Message Prefix:**\n` +
                 `\`${PARSE_BY_MESSAGE_PREFIX}2h20+5;2de6+3\` - Advantage attack with prefix\n` +
                 `\`${PARSE_BY_MESSAGE_PREFIX}coin-with-edge\` - Dramatic coin flip\n` +
-                `\`${PARSE_BY_MESSAGE_PREFIX}someone repeat:4\` - Initiative order with prefix\n`
+                `\`${PARSE_BY_MESSAGE_PREFIX}unique count:5 sides:12\` - Unique selection with prefix\n`
                 : ''),
-        value: '8'
+        value: '9'
     },
     {
         title: '🔧 System Limits & Options',
@@ -239,6 +275,9 @@ const helpPages = [
             '• `repeat` - Global repetition count\n' +
             '• `filter-by` - Global filter for all results\n' +
             '• `hide` - Hide results with spoiler tags\n\n' +
+            '**Unique Command Options:**\n' +
+            '• `count` - Number of unique values to generate (required)\n' +
+            '• `sides` - Maximum value range (1 to sides) (required)\n\n' +
             '**Someone Command Options:**\n' +
             '• `exclude` - Interactive user exclusion menu\n' +
             '• `repeat` - Multiple selections with statistics\n\n' +
@@ -247,6 +286,7 @@ const helpPages = [
                 `\`${PARSE_BY_MESSAGE_PREFIX}help\` - Show this help menu\n` +
                 `\`${PARSE_BY_MESSAGE_PREFIX}coin\` - Toss a regular coin\n` +
                 `\`${PARSE_BY_MESSAGE_PREFIX}coin-with-edge\` - Toss coin with edge chance\n` +
+                `\`${PARSE_BY_MESSAGE_PREFIX}unique count:X sides:Y\` - Generate unique values\n` +
                 `\`${PARSE_BY_MESSAGE_PREFIX}someone [options]\` - Choose random member\n` +
                 `\`${PARSE_BY_MESSAGE_PREFIX}someone-except-me [options]\` - Choose random member excluding you\n` +
                 `\`${PARSE_BY_MESSAGE_PREFIX}expression\` - Roll dice expression\n\n`
@@ -258,9 +298,10 @@ const helpPages = [
             `• Maximum expression length: ${MAX_EXPRESSION_LENGTH} characters\n\n` +
             '**Special Features:**\n' +
             '• Exploding dice chain indefinitely\n' +
+            '• Unique values guarantee no duplicates\n' +
             '• Secure random number generation\n' +
             '• Automatic file attachment for long results',
-        value: '9'
+        value: '10'
     }
 ];
 
