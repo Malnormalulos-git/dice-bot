@@ -10,6 +10,8 @@ import coin from "../commands/roll/coin";
 import CoinTosser from "../business-logic/coin/CoinTosser";
 import HelpHandler from "../business-logic/help/HelpHandler";
 import help from "../commands/core/help";
+import unique from "../commands/roll/unique";
+import {UniqueValuesRoller} from "../business-logic/unique/UniqueValuesRoller";
 
 const messageWithPrefix: Event = {
     name: Events.MessageCreate,
@@ -45,6 +47,10 @@ const messageWithPrefix: Event = {
             return;
         } else if (input.startsWith(coin.data.name)) {
             await CoinTosser.executeFromMessage(message);
+            return;
+        } else if (input.startsWith(unique.data.name)) {
+            cropInputStart(unique.data.name.length);
+            await UniqueValuesRoller.executeFromMessage(message, input);
             return;
         } else {
             await DiceRoller.executeFromMessage(message, input);

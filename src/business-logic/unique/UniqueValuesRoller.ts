@@ -22,7 +22,8 @@ export class UniqueValuesRoller {
         const {count = 1, size = 1} = options;
 
         if (count > size) {
-            throw new UserError('Count cannot be greater than size!');
+            await adapter.editReply('Count cannot be greater than size!');
+            return;
         }
 
         const valuesSet = new Set(Array.from({length: size}, (_, index) => index + 1));
