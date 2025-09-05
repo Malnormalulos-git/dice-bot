@@ -32,12 +32,20 @@
 - Option to exclude yourself from selection
 - Selector to exclude other users from selection
 
+### Unique Values Generation
+
+- Generate specified number of unique random values
+- No duplicate values within a single command
+- Customizable range (1 to specified maximum)
+- Perfect for unique selections, assignments, or distributions
+
 ## Commands
 
 ### Basic Commands
 
 - `/roll 'expression'` - main dice rolling command
 - `/r 'expression'` - shortened version of /roll
+- `/unique count:X sides:Y` - generate X unique values from 1 to Y
 - `/coin` - flip a regular coin
 - `/coin-with-edge` - flip coin with rare edge possibility
 - `/someone` - pick random person from voice channel
@@ -52,6 +60,7 @@ You can also use commands by message with prefix: `!command`
 **Available prefix commands:**
 
 - `!help` - show help information
+- `!unique count:X sides:Y` - generate unique values (params - `count`(number) and `sides`(number))
 - `!someone` - pick random person from voice channel (params - `repeat`(number) and `exclude`(boolean))
 - `!someone-except-me` - pick random person excluding yourself (params - same as `someone`)
 - `!coin` - flip a regular coin
@@ -132,6 +141,16 @@ automatically rolled. This process continues until a result less than the maximu
 ```
 /roll d20 cover-up-with-spoiler:true  # Hide results with spoiler tags
 ```
+
+### Unique Values
+
+```
+/unique count:3 sides:6    # Generate 3 unique values from 1-6
+/unique count:5 sides:20   # Generate 5 unique values from 1-20
+/unique count:10 sides:100 # Generate 10 unique values from 1-100
+```
+
+**Unique values logic:** Generates the specified count of unique random numbers from 1 to the maximum value. No duplicates are possible within a single command. Count cannot exceed the number of sides.
 
 ## Advanced Features
 
@@ -273,6 +292,9 @@ at [Discord Developer Portal](https://discord.com/developers/applications) → "
 
 /roll 2de6+3          # Exploding dice roll
 /roll 4de6[>=5c]      # Exploding dice with success counting
+
+/unique count:4 sides:20    # Assign unique initiative positions
+/unique count:6 sides:10    # Pick unique treasure items
 ```
 
 ### Group Activities
@@ -282,6 +304,16 @@ at [Discord Developer Portal](https://discord.com/developers/applications) → "
 /someone-except-me    # Pick someone else to go first
 /coin                 # Quick yes/no decision
 /coin-with-edge       # Dramatic decision with rare third option
+/unique count:3 sides:8     # Assign 3 unique seating positions
+```
+
+### Unique Value Applications
+
+```
+/unique count:5 sides:12    # Pick 5 unique months for events
+/unique count:7 sides:20    # Select 7 unique room numbers
+/unique count:3 sides:100   # Choose 3 unique percentile ranges
+/unique count:10 sides:52   # Draw 10 unique cards (1-52)
 ```
 
 ### Complex Expressions
@@ -292,3 +324,4 @@ at [Discord Developer Portal](https://discord.com/developers/applications) → "
 /roll r20:d20[>=15c] repeat:3   # Statistical analysis
 /roll 3de10+2de6                # Multiple exploding dice types
 ```
+   
