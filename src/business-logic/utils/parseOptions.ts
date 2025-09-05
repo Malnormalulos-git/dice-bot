@@ -31,6 +31,7 @@ export default function parseOptions(input: string, options: ToAPIApplicationCom
         const name = param.name.toLowerCase().trim();
         const optionDef = parsedOptions.find(opt => opt.name === name);
         if (!optionDef) continue;
+        if (!param.value) continue;
 
         const valueString = param.value.trim();
         let value: boolean | number | string | null = null;
