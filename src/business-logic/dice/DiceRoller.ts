@@ -1,5 +1,5 @@
 ﻿import {FilterType, ParserResultsFilter} from "./models/ParserResultsFilter";
-import {AttachmentBuilder, CommandInteraction, Message} from "discord.js";
+import {CommandInteraction, Message} from "discord.js";
 import {DiceExpression} from "./models/DiceExpression";
 import {ParserResult} from "./models/ParserResult";
 import {DiceExpressionParser} from "./parser/DiceExpressionParser";
@@ -7,6 +7,7 @@ import {randomNumber} from "../random/randomNumber";
 import {UserError} from "../errors/UserError";
 import {config} from "../../../config";
 import toFixedWithRounding from "../utils/toFixedWithRounding";
+import {handleLargeOutput, MessageOutput} from "../utils/outputFormatting";
 
 const {
     ROLL_KEYWORD_SYNONYMS,
@@ -14,8 +15,7 @@ const {
     LOWEST_ROLL_KEYWORD_SYNONYMS,
     AVERAGE_ROLL_KEYWORD_SYNONYMS,
     EXPLODE_EXPRESSION_KEYWORD_SYNONYMS,
-    REPEAT_EXPRESSION_KEYWORD_SYNONYMS,
-    MAX_DISCORD_MESSAGE_LENGTH
+    REPEAT_EXPRESSION_KEYWORD_SYNONYMS
 } = config;
 
 export default class DiceRoller {
@@ -153,19 +153,13 @@ export default class DiceRoller {
         return resultExpression;
     }
 
-    private static wrapInMarkdown(output: string, isCoveredBySpoiler: boolean): string {
-        if (isCoveredBySpoiler)
-            return `||\`\`\`Markdown\n${output.trim()}\`\`\`||`;
-        return `\`\`\`Markdown\n${output.trim()}\`\`\``;
-    }
-
     /**
      * Formats the output of processed dice roll expressions
      */
     private static outputFormatter(
         processedExpressions: Array<{ expression: DiceExpression; results: (ParserResult | { error: string })[] }>,
         isCoveredBySpoiler: boolean = false
-    ): string | { content: string; files: AttachmentBuilder[] } {
+    ): string | MessageOutput {
         const finalResults: string[] = [];
         let expressionsList = '';
         let rollsList = '\n\n';
@@ -219,21 +213,10 @@ export default class DiceRoller {
         });
 
         const totalSums = '# ' + finalResults.join('; ');
-        const output = totalSums + expressionsList + rollsList;
-        const wrappedOutput = DiceRoller.wrapInMarkdown(output, isCoveredBySpoiler);
+        const fullOutput = totalSums + expressionsList + rollsList;
+        const summaryOutput = totalSums + expressionsList;
 
-        if (wrappedOutput.length > MAX_DISCORD_MESSAGE_LENGTH) {
-            const buffer = Buffer.from(output, 'utf8');
-            const attachment = new AttachmentBuilder(buffer, {name: 'detailed.txt'});
-            const content = DiceRoller.wrapInMarkdown(totalSums + expressionsList, isCoveredBySpoiler);
-
-            return {
-                content: content.length > MAX_DISCORD_MESSAGE_LENGTH ? '`See detailed attachment`' : content,
-                files: [attachment]
-            };
-        } else {
-            return wrappedOutput;
-        }
+        return handleLargeOutput(fullOutput, summaryOutput, isCoveredBySpoiler, 'detailed.txt');
     }
 
     /**
