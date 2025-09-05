@@ -4,9 +4,11 @@ import InteractionAdapter from "../adapters/InteractionAdapter";
 import MessageAdapter from "../adapters/MessageAdapter";
 import parseOptions from "../utils/parseOptions";
 import unique from "../../commands/roll/unique";
-import {UserError} from "../errors/UserError";
 import {CommandInteraction, Message} from "discord.js";
 import {handleLargeOutput} from "../utils/outputFormatting";
+import {config} from "../../../config";
+
+const {MAX_DICE_COUNT, MAX_DICE_SIDES} = config;
 
 export class UniqueValuesRoller {
     /**
@@ -16,22 +18,28 @@ export class UniqueValuesRoller {
         adapter: CommandAdapter,
         options: {
             count?: number;
-            size?: number;
+            sides?: number;
         } = {}
     ): Promise<void> {
-        const {count = 1, size = 1} = options;
+        const {count = 0, sides = 0} = options;
 
-        if (count > size) {
-            await adapter.editReply('Count cannot be greater than size!');
+        if (count > sides) {
+            await adapter.editReply('Count cannot be greater than number of sides!');
+            return;
+        } else if (count <= 1 || sides <= 1) {
+            await adapter.editReply('Count and number of sides must be greater than 0!');
+            return;
+        } else if (count > MAX_DICE_COUNT || sides > MAX_DICE_SIDES) {
+            await adapter.editReply(`Too big number of dice or sides. Maximum is ${MAX_DICE_COUNT}d${MAX_DICE_SIDES}`);
             return;
         }
 
-        const valuesSet = new Set(Array.from({length: size}, (_, index) => index + 1));
+        const valuesSet = new Set(Array.from({length: sides}, (_, index) => index + 1));
         const resultsSet = new Set();
 
         while (resultsSet.size < count) {
             const valuesArray = Array.from(valuesSet);
-            const randomIndex = randomNumber(size - resultsSet.size) - 1;
+            const randomIndex = randomNumber(sides - resultsSet.size) - 1;
             const value = valuesArray[randomIndex];
 
             valuesSet.delete(value);
@@ -55,9 +63,9 @@ export class UniqueValuesRoller {
 
         const adapter = new InteractionAdapter(interaction);
         const count = interaction.options.getNumber('count') || undefined;
-        const size = interaction.options.getNumber('size') || undefined;
+        const sides = interaction.options.getNumber('sides') || undefined;
 
-        await this.executeWithAdapter(adapter, {count, size});
+        await this.executeWithAdapter(adapter, {count, sides: sides});
     }
 
     /**
@@ -70,8 +78,8 @@ export class UniqueValuesRoller {
         const parsedOptions = parseOptions(input, commandOptions);
 
         const count = parsedOptions.count as number;
-        const size = parsedOptions.size as number;
+        const sides = parsedOptions.sides as number;
 
-        await this.executeWithAdapter(adapter, {count, size});
+        await this.executeWithAdapter(adapter, {count, sides: sides});
     }
 }

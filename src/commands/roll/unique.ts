@@ -12,8 +12,8 @@ const unique: Command = {
                 .setMinValue(1)
                 .setRequired(true))
         .addNumberOption(option =>
-            option.setName('size')
-                .setDescription('Size of dice')
+            option.setName('sides')
+                .setDescription('Number of dice sides')
                 .setMinValue(1)
                 .setRequired(true)),
     async execute(interaction: CommandInteraction) {
