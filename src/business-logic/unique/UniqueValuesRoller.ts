@@ -26,7 +26,7 @@ export class UniqueValuesRoller {
         if (count > sides) {
             await adapter.editReply('Count cannot be greater than number of sides!');
             return;
-        } else if (count <= 1 || sides <= 1) {
+        } else if (count <= 0 || sides <= 0) {
             await adapter.editReply('Count and number of sides must be greater than 0!');
             return;
         } else if (count > MAX_DICE_COUNT || sides > MAX_DICE_SIDES) {
