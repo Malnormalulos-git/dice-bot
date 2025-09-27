@@ -1,6 +1,6 @@
 ﻿import {
     ActionRowBuilder,
-    CommandInteraction,
+    ChatInputCommandInteraction,
     ComponentType,
     EmbedBuilder,
     GuildMember, Message,
@@ -10,9 +10,9 @@
 import {config} from "../../../config";
 import toFixedWithRounding from "../utils/toFixedWithRounding";
 import {randomNumber} from "../random/randomNumber";
-import MessageAdapter from "../adapters/MessageAdapter";
-import InteractionAdapter from "../adapters/InteractionAdapter";
-import CommandAdapter from "../adapters/CommandAdapter";
+import MessageAdapter from "../../adapters/MessageAdapter";
+import InteractionAdapter from "../../adapters/InteractionAdapter";
+import CommandAdapter from "../../adapters/CommandAdapter";
 import someone from "../../commands/roll/someone";
 import parseOptions from "../utils/parseOptions";
 
@@ -210,11 +210,9 @@ export class RandomMemberSelector {
      * Execute from SlashCommand
      */
     static async executeFromInteraction(
-        interaction: CommandInteraction,
+        interaction: ChatInputCommandInteraction,
         filterCallback: (member: GuildMember, invoker: GuildMember) => boolean = () => true
     ): Promise<void> {
-        if (!interaction.isChatInputCommand()) return;
-
         const adapter = new InteractionAdapter(interaction);
         const exclude = interaction.options.getBoolean('exclude') || false;
         const repeat = interaction.options.getNumber('repeat') || 1;

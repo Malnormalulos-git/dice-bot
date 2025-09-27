@@ -3,14 +3,14 @@ import {
     Collection,
     SlashCommandBuilder,
     AutocompleteInteraction,
-    CommandInteraction,
     SlashCommandOptionsOnlyBuilder,
-    SlashCommandSubcommandsOnlyBuilder
+    SlashCommandSubcommandsOnlyBuilder,
+    ChatInputCommandInteraction
 } from 'discord.js';
 
 export interface Command {
     data: SlashCommandBuilder | SlashCommandOptionsOnlyBuilder | SlashCommandSubcommandsOnlyBuilder;
-    execute: (interaction: CommandInteraction) => Promise<void>;
+    execute: (interaction: ChatInputCommandInteraction) => Promise<void>;
     autocomplete?: (interaction: AutocompleteInteraction) => Promise<void>;
 }
 

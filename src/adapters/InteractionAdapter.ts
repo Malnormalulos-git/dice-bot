@@ -1,13 +1,13 @@
 ﻿import CommandAdapter from "./CommandAdapter";
 import {
-    CommandInteraction,
+    ChatInputCommandInteraction,
     GuildMember,
     MessageCollectorOptionsParams,
     MessageComponentType
 } from "discord.js";
 
 export default class InteractionAdapter implements CommandAdapter {
-    constructor(private interaction: CommandInteraction) {
+    constructor(private interaction: ChatInputCommandInteraction) {
     }
 
     get member() {

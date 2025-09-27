@@ -1,6 +1,6 @@
 import {Events, MessageFlags} from "discord.js";
 import {Event} from "../types/types";
-import {UserError} from "../business-logic/errors/UserError";
+import {UserError} from "../core/errors/UserError";
 
 const EPHEMERAL_COMMANDS = ['help'];
 

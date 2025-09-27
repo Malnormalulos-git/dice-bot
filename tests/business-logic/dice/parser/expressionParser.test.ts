@@ -1,5 +1,5 @@
 import {config} from "../../../../config";
-import {DiceExpressionParser} from "../../../../src/business-logic/dice/parser/DiceExpressionParser";
+import {DiceExpressionParser} from "../../../../src/core/dice/parser/DiceExpressionParser";
 import {describe, expect, test} from "@jest/globals";
 
 const {MAX_DICE_COUNT, MAX_DICE_SIDES, MAX_EXPRESSION_LENGTH} = config;

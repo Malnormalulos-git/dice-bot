@@ -1,17 +1,17 @@
 ﻿import {Events, Message} from 'discord.js';
 import {Event} from '../types/types';
 import {config} from "../../config";
-import {RandomMemberSelector} from "../business-logic/randomMember/RandomMemberSelector";
+import {RandomMemberSelector} from "../core/randomMember/RandomMemberSelector";
 import someoneExceptMe from "../commands/roll/someone-except-me";
 import someone from "../commands/roll/someone";
-import DiceRoller from "../business-logic/dice/DiceRoller";
+import DiceRoller from "../core/dice/DiceRoller";
 import coinWithEdge from "../commands/roll/coin-with-edge";
 import coin from "../commands/roll/coin";
-import CoinTosser from "../business-logic/coin/CoinTosser";
-import HelpHandler from "../business-logic/help/HelpHandler";
+import CoinTosser from "../core/coin/CoinTosser";
+import HelpHandler from "../core/help/HelpHandler";
 import help from "../commands/core/help";
 import unique from "../commands/roll/unique";
-import {UniqueValuesRoller} from "../business-logic/unique/UniqueValuesRoller";
+import {UniqueValuesRoller} from "../core/unique/UniqueValuesRoller";
 
 const messageWithPrefix: Event = {
     name: Events.MessageCreate,

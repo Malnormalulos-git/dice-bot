@@ -1,11 +1,11 @@
-﻿import {CommandInteraction} from 'discord.js';
+﻿import {ChatInputCommandInteraction} from 'discord.js';
 import {Command} from '../../types/types';
-import {RandomMemberSelector} from '../../business-logic/randomMember/RandomMemberSelector';
+import {RandomMemberSelector} from '../../core/randomMember/RandomMemberSelector';
 import {createSomeoneCommand} from "../../utils/commandBuilders/createSomeoneCommand";
 
 const someone: Command = {
     data: createSomeoneCommand('someone', 'Chooses one random participant from voice channel'),
-    async execute(interaction: CommandInteraction) {
+    async execute(interaction: ChatInputCommandInteraction) {
         await RandomMemberSelector.executeFromInteraction(interaction);
     }
 };

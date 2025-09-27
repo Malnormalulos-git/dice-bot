@@ -1,6 +1,6 @@
 ﻿import {
     ActionRowBuilder,
-    CommandInteraction,
+    ChatInputCommandInteraction,
     ComponentType,
     EmbedBuilder,
     Message,
@@ -9,9 +9,9 @@
     StringSelectMenuOptionBuilder
 } from 'discord.js';
 import {config} from '../../../config';
-import CommandAdapter from '../adapters/CommandAdapter';
-import InteractionAdapter from '../adapters/InteractionAdapter';
-import MessageAdapter from '../adapters/MessageAdapter';
+import CommandAdapter from '../../adapters/CommandAdapter';
+import InteractionAdapter from '../../adapters/InteractionAdapter';
+import MessageAdapter from '../../adapters/MessageAdapter';
 
 const {
     ROLL_KEYWORD_SYNONYMS,
@@ -372,7 +372,7 @@ class HelpHandler {
         });
     }
 
-    static async executeFromInteraction(interaction: CommandInteraction): Promise<void> {
+    static async executeFromInteraction(interaction: ChatInputCommandInteraction): Promise<void> {
         const adapter = new InteractionAdapter(interaction);
         await this.executeWithAdapter(adapter);
     }

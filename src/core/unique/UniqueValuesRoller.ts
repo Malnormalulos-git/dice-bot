@@ -1,10 +1,10 @@
 ﻿import {randomNumber} from "../random/randomNumber";
-import CommandAdapter from "../adapters/CommandAdapter";
-import InteractionAdapter from "../adapters/InteractionAdapter";
-import MessageAdapter from "../adapters/MessageAdapter";
+import CommandAdapter from "../../adapters/CommandAdapter";
+import InteractionAdapter from "../../adapters/InteractionAdapter";
+import MessageAdapter from "../../adapters/MessageAdapter";
 import parseOptions from "../utils/parseOptions";
 import unique from "../../commands/roll/unique";
-import {CommandInteraction, Message} from "discord.js";
+import {ChatInputCommandInteraction, Message} from "discord.js";
 import {handleLargeOutput} from "../utils/outputFormatting";
 import {config} from "../../../config";
 
@@ -58,9 +58,7 @@ export class UniqueValuesRoller {
     /**
      * Execute from SlashCommand
      */
-    static async executeFromInteraction(interaction: CommandInteraction): Promise<void> {
-        if (!interaction.isChatInputCommand()) return;
-
+    static async executeFromInteraction(interaction: ChatInputCommandInteraction): Promise<void> {
         const adapter = new InteractionAdapter(interaction);
         const count = interaction.options.getNumber('count') || undefined;
         const sides = interaction.options.getNumber('sides') || undefined;

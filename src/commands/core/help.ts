@@ -1,12 +1,12 @@
-﻿import {CommandInteraction, SlashCommandBuilder} from 'discord.js';
+﻿import {ChatInputCommandInteraction, SlashCommandBuilder} from 'discord.js';
 import {Command} from '../../types/types';
-import HelpHandler from '../../business-logic/help/HelpHandler';
+import HelpHandler from '../../core/help/HelpHandler';
 
 const help: Command = {
     data: new SlashCommandBuilder()
         .setName('help')
         .setDescription('Shows information about Dice Rolling Bot commands'),
-    async execute(interaction: CommandInteraction) {
+    async execute(interaction: ChatInputCommandInteraction) {
         await HelpHandler.executeFromInteraction(interaction);
     }
 };

@@ -1,5 +1,5 @@
 ﻿import {FilterType, ParserResultsFilter} from "./models/ParserResultsFilter";
-import {CommandInteraction, Message} from "discord.js";
+import {ChatInputCommandInteraction, Message} from "discord.js";
 import {DiceExpression} from "./models/DiceExpression";
 import {ParserResult} from "./models/ParserResult";
 import {DiceExpressionParser} from "./parser/DiceExpressionParser";
@@ -79,11 +79,7 @@ export default class DiceRoller {
     /**
      * Execute from SlashCommand
      */
-    static async executeFromInteraction(
-        interaction: CommandInteraction
-    ): Promise<void> {
-        if (!interaction.isChatInputCommand()) return;
-
+    static async executeFromInteraction(interaction: ChatInputCommandInteraction): Promise<void> {
         const expression = interaction.options.getString('expression')!;
         const repeat = interaction.options.getNumber('repeat') || 1;
         const isCoveredBySpoiler = interaction.options.getBoolean('hide') || false;

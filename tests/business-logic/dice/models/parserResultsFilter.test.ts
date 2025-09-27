@@ -3,8 +3,8 @@ import {
     FilterCompairerType,
     FilterType,
     ParserResultsFilter
-} from "../../../../src/business-logic/dice/models/ParserResultsFilter";
-import {UserError} from "../../../../src/business-logic/errors/UserError";
+} from "../../../../src/core/dice/models/ParserResultsFilter";
+import {UserError} from "../../../../src/core/errors/UserError";
 
 describe('ParserResultsFilter', () => {
     describe('Constructor', () => {

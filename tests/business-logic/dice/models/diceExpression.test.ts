@@ -1,10 +1,10 @@
 ﻿import {describe, expect, test} from "@jest/globals";
-import {DiceExpression} from "../../../../src/business-logic/dice/models/DiceExpression";
+import {DiceExpression} from "../../../../src/core/dice/models/DiceExpression";
 import {
     FilterCompairerType,
     FilterType,
     ParserResultsFilter
-} from "../../../../src/business-logic/dice/models/ParserResultsFilter";
+} from "../../../../src/core/dice/models/ParserResultsFilter";
 
 describe('DiceExpression.fromRawExpression', () => {
     test('should parse dice expressions from raw expression', () => {

@@ -1,6 +1,6 @@
-﻿import {SlashCommandBuilder, CommandInteraction} from 'discord.js';
+﻿import {SlashCommandBuilder, ChatInputCommandInteraction} from 'discord.js';
 import {Command} from '../../types/types';
-import {UniqueValuesRoller} from "../../business-logic/unique/UniqueValuesRoller";
+import {UniqueValuesRoller} from "../../core/unique/UniqueValuesRoller";
 
 const unique: Command = {
     data: new SlashCommandBuilder()
@@ -16,7 +16,7 @@ const unique: Command = {
                 .setDescription('Number of dice sides')
                 .setMinValue(1)
                 .setRequired(true)),
-    async execute(interaction: CommandInteraction) {
+    async execute(interaction: ChatInputCommandInteraction) {
         await UniqueValuesRoller.executeFromInteraction(interaction);
     }
 };

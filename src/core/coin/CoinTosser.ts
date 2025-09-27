@@ -2,7 +2,7 @@
 import path from "node:path";
 import {randomNumber} from "../random/randomNumber";
 import {config} from "../../../config";
-import {CommandInteraction, Message} from "discord.js";
+import {ChatInputCommandInteraction, Message} from "discord.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -26,9 +26,7 @@ export default class CoinTosser {
     /**
      * Execute from SlashCommand
      */
-    static async executeFromInteraction(interaction: CommandInteraction, withEdge: boolean = false): Promise<void> {
-        if (!interaction.isChatInputCommand()) return;
-
+    static async executeFromInteraction(interaction: ChatInputCommandInteraction, withEdge: boolean = false): Promise<void> {
         const result = CoinTosser.toss(withEdge);
 
         await interaction.editReply({
